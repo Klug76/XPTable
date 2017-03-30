@@ -25,28 +25,23 @@
  */
 
 
-using System;
-using System.Collections;
-
+using System.Collections.Generic;
 
 namespace XPTable.Models.Design
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	internal class RowComparer : IComparer
+	internal class RowComparer : IComparer<Row>
 	{
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
+		/// <param name="row1"></param>
+		/// <param name="row2"></param>
 		/// <returns></returns>
-		public int Compare(object x, object y)
+		public int Compare(Row row1, Row row2)
 		{
-			Row row1 = (Row) x;
-			Row row2 = (Row) y;
-			
 			// check for null rows
 			if (row1 == null && row2 == null)
 			{

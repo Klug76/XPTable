@@ -1,0 +1,27 @@
+https://github.com/antiduh/XPTable/commit/08378304b42f21ea83667f597201c6f2e10368c6
+
+There were a few bugs in v1.2.2 that broke when using group columns:
+ - ColumnCollectionEditor didn't understand group columns, so you couldn't add them in the designer UI.
+
+ - RowCollection.ExpandAllSubRows() would fail to expand rows correctly when group columns existed ('subrows'), and RowCollection.Clear didn't reset the _totalHiddenSubRows variable, causing the collection to think that there were negative visibile rows after clearing with subrows hidden.
+
+ - Table has a scrollbar bug, secondary to having negative visible rows, that would cause infinite stack recursion when trying to update the scrollbar position in UpdateScrollBars(). visibleRowCount would be a negative number and so it would try to set the scrollbar position to a negative value. The scrollbar would see that it is setting a negative value, fix it up to zero, and then fire its changed event. UpdateScrollBars usually fires again, but normally it does nothing because it sets the scrollbar to a value that it is already, and so the next event doesn't fire and UpdateScrollBars doesn't run again, thus ending the recursion. However, setting the scrollbar to a negative value causes it to check for equality *before* fixing up the value and storing it. It would see that eg, -1 != 0, decide to do the change (and thus eventually fire the event), fix up the value to 0 ... and save 0 on top of 0 and fire the changed event. Since UpdateScrollBars() is in the event's path, it always fires, and we end up in an infinite loop. Yuck.
+
+
+.BUG: drag cause row mess and crash!
+.rewrite drag n drop
+	. auto-scrolling during drag
+		.http://blog.scottlogic.com/2012/05/29/developing-an-extended-drag-and-drop-treeview-control-in-c-net.html
+		.by timer
+	.BUG: focused cell frame broken
+	. ?query drop to dst?
+	+. Escape must cancel drag
+	+. only move rows, newer add
+	+. query move src
+	+. src row may be deleted in drag loop!
+	+. drag distance threshold
+		.https://www.codeproject.com/Articles/17266/Drag-and-Drop-Items-in-a-WPF-ListView
+	+. check focus out, too
+	+. allow r-drag?!?
+see also c:\Documents and Settings\Admin\Downloads\ListViewDragDropManager_src.zip
+

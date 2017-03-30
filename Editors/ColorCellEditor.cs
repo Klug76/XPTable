@@ -3746,29 +3746,30 @@ namespace XPTable.Editors
 					/// </summary>
 					private void ClearMarker()
 					{
-						Graphics g = this.CreateGraphics();
-			
-						//	Determine the area that needs to be redrawn
-						int start_x, start_y, end_x, end_y;
-						int red = 0; int green = 0; int blue = 0;
-						AdobeColors.HSL hsl_start = new AdobeColors.HSL();
-						AdobeColors.HSL hsl_end = new AdobeColors.HSL();
-
-						//	Find the markers corners
-						start_x = m_iMarker_X - 5;
-						start_y = m_iMarker_Y - 5;
-						end_x = m_iMarker_X + 5;
-						end_y = m_iMarker_Y + 5;
-						//	Adjust the area if part of it hangs outside the content area
-						if ( start_x < 0 ) start_x = 0;
-						if ( start_y < 0 ) start_y = 0;
-						if ( end_x > this.Width - 4 ) end_x = this.Width - 4;
-						if ( end_y > this.Height - 4 ) end_y = this.Height - 4;
-
-						//	Redraw the content based on the current draw style:
-						//	The code get's a little messy from here
-						switch (m_eDrawStyle)
+						using (Graphics g = this.CreateGraphics())
 						{
+
+							//	Determine the area that needs to be redrawn
+							int start_x, start_y, end_x, end_y;
+							int red = 0; int green = 0; int blue = 0;
+							AdobeColors.HSL hsl_start = new AdobeColors.HSL();
+							AdobeColors.HSL hsl_end = new AdobeColors.HSL();
+
+							//	Find the markers corners
+							start_x = m_iMarker_X - 5;
+							start_y = m_iMarker_Y - 5;
+							end_x = m_iMarker_X + 5;
+							end_y = m_iMarker_Y + 5;
+							//	Adjust the area if part of it hangs outside the content area
+							if (start_x < 0) start_x = 0;
+							if (start_y < 0) start_y = 0;
+							if (end_x > this.Width - 4) end_x = this.Width - 4;
+							if (end_y > this.Height - 4) end_y = this.Height - 4;
+
+							//	Redraw the content based on the current draw style:
+							//	The code get's a little messy from here
+							switch (m_eDrawStyle)
+							{
 								//		  S=0,S=1,S=2,S=3.....S=100
 								//	L=100
 								//	L=99
@@ -3776,22 +3777,22 @@ namespace XPTable.Editors
 								//	L=97		   Hue
 								//	...
 								//	L=0
-							case eDrawStyle.Hue :	
+								case eDrawStyle.Hue:
 
-								hsl_start.H = m_hsl.H;	hsl_end.H = m_hsl.H;	//	Hue is constant
-								hsl_start.S = (double)start_x/(this.Width - 4);	//	Because we're drawing horizontal lines, s will not change
-								hsl_end.S = (double)end_x/(this.Width - 4);		//	from line to line
+									hsl_start.H = m_hsl.H; hsl_end.H = m_hsl.H; //	Hue is constant
+									hsl_start.S = (double)start_x / (this.Width - 4);   //	Because we're drawing horizontal lines, s will not change
+									hsl_end.S = (double)end_x / (this.Width - 4);       //	from line to line
 
-								for ( int i = start_y; i <= end_y; i++ )		//	For each horizontal line:
-								{
-									hsl_start.L = 1.0 - (double)i/(this.Height - 4);	//	Brightness (L) WILL change for each horizontal
-									hsl_end.L = hsl_start.L;							//	line drawn
-				
-									LinearGradientBrush br = new LinearGradientBrush(new Rectangle(start_x + 1,i + 2, end_x - start_x + 1, 1), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 0, false); 
-									g.FillRectangle(br,new Rectangle(start_x + 2,i + 2, end_x - start_x + 1 , 1)); 
-								}
-					
-								break;
+									for (int i = start_y; i <= end_y; i++)      //	For each horizontal line:
+									{
+										hsl_start.L = 1.0 - (double)i / (this.Height - 4);  //	Brightness (L) WILL change for each horizontal
+										hsl_end.L = hsl_start.L;                            //	line drawn
+
+										LinearGradientBrush br = new LinearGradientBrush(new Rectangle(start_x + 1, i + 2, end_x - start_x + 1, 1), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 0, false);
+										g.FillRectangle(br, new Rectangle(start_x + 2, i + 2, end_x - start_x + 1, 1));
+									}
+
+									break;
 								//		  H=0,H=1,H=2,H=3.....H=360
 								//	L=100
 								//	L=99
@@ -3799,21 +3800,21 @@ namespace XPTable.Editors
 								//	L=97		Saturation
 								//	...
 								//	L=0
-							case eDrawStyle.Saturation :
+								case eDrawStyle.Saturation:
 
-								hsl_start.S = m_hsl.S;	hsl_end.S = m_hsl.S;			//	Saturation is constant
-								hsl_start.L = 1.0 - (double)start_y/(this.Height - 4);	//	Because we're drawing vertical lines, L will 
-								hsl_end.L = 1.0 - (double)end_y/(this.Height - 4);		//	not change from line to line
+									hsl_start.S = m_hsl.S; hsl_end.S = m_hsl.S;         //	Saturation is constant
+									hsl_start.L = 1.0 - (double)start_y / (this.Height - 4);    //	Because we're drawing vertical lines, L will 
+									hsl_end.L = 1.0 - (double)end_y / (this.Height - 4);        //	not change from line to line
 
-								for ( int i = start_x; i <= end_x; i++ )				//	For each vertical line:
-								{
-									hsl_start.H = (double)i/(this.Width - 4);			//	Hue (H) WILL change for each vertical
-									hsl_end.H = hsl_start.H;							//	line drawn
-				
-									LinearGradientBrush br = new LinearGradientBrush(new Rectangle(i + 2,start_y + 1, 1, end_y - start_y + 2), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 90, false); 
-									g.FillRectangle(br,new Rectangle(i + 2, start_y + 2, 1, end_y - start_y + 1)); 
-								}
-								break;
+									for (int i = start_x; i <= end_x; i++)              //	For each vertical line:
+									{
+										hsl_start.H = (double)i / (this.Width - 4);         //	Hue (H) WILL change for each vertical
+										hsl_end.H = hsl_start.H;                            //	line drawn
+
+										LinearGradientBrush br = new LinearGradientBrush(new Rectangle(i + 2, start_y + 1, 1, end_y - start_y + 2), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 90, false);
+										g.FillRectangle(br, new Rectangle(i + 2, start_y + 2, 1, end_y - start_y + 1));
+									}
+									break;
 								//		  H=0,H=1,H=2,H=3.....H=360
 								//	S=100
 								//	S=99
@@ -3821,22 +3822,22 @@ namespace XPTable.Editors
 								//	S=97		Brightness
 								//	...
 								//	S=0
-							case eDrawStyle.Brightness :
-					
-								hsl_start.L = m_hsl.L;	hsl_end.L = m_hsl.L;			//	Luminance is constant
-								hsl_start.S = 1.0 - (double)start_y/(this.Height - 4);	//	Because we're drawing vertical lines, S will 
-								hsl_end.S = 1.0 - (double)end_y/(this.Height - 4);		//	not change from line to line
+								case eDrawStyle.Brightness:
 
-								for ( int i = start_x; i <= end_x; i++ )				//	For each vertical line:
-								{
-									hsl_start.H = (double)i/(this.Width - 4);			//	Hue (H) WILL change for each vertical
-									hsl_end.H = hsl_start.H;							//	line drawn
-				
-									LinearGradientBrush br = new LinearGradientBrush(new Rectangle(i + 2,start_y + 1, 1, end_y - start_y + 2), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 90, false); 
-									g.FillRectangle(br,new Rectangle(i + 2, start_y + 2, 1, end_y - start_y + 1)); 
-								}
+									hsl_start.L = m_hsl.L; hsl_end.L = m_hsl.L;         //	Luminance is constant
+									hsl_start.S = 1.0 - (double)start_y / (this.Height - 4);    //	Because we're drawing vertical lines, S will 
+									hsl_end.S = 1.0 - (double)end_y / (this.Height - 4);        //	not change from line to line
 
-								break;
+									for (int i = start_x; i <= end_x; i++)              //	For each vertical line:
+									{
+										hsl_start.H = (double)i / (this.Width - 4);         //	Hue (H) WILL change for each vertical
+										hsl_end.H = hsl_start.H;                            //	line drawn
+
+										LinearGradientBrush br = new LinearGradientBrush(new Rectangle(i + 2, start_y + 1, 1, end_y - start_y + 2), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 90, false);
+										g.FillRectangle(br, new Rectangle(i + 2, start_y + 2, 1, end_y - start_y + 1));
+									}
+
+									break;
 								//		  B=0,B=1,B=2,B=3.....B=100
 								//	G=100
 								//	G=99
@@ -3844,21 +3845,21 @@ namespace XPTable.Editors
 								//	G=97		   Red
 								//	...
 								//	G=0
-							case eDrawStyle.Red :
-					
-								red = m_rgb.R;													//	Red is constant
-								int start_b = Round(255 * (double)start_x/(this.Width - 4));	//	Because we're drawing horizontal lines, B
-								int end_b = Round(255 * (double)end_x/(this.Width - 4));		//	will not change from line to line
+								case eDrawStyle.Red:
 
-								for ( int i = start_y; i <= end_y; i++ )						//	For each horizontal line:
-								{
-									green = Round(255 - (255 * (double)i/(this.Height - 4)));	//	green WILL change for each horizontal line drawn
+									red = m_rgb.R;                                                  //	Red is constant
+									int start_b = Round(255 * (double)start_x / (this.Width - 4));  //	Because we're drawing horizontal lines, B
+									int end_b = Round(255 * (double)end_x / (this.Width - 4));      //	will not change from line to line
 
-									LinearGradientBrush br = new LinearGradientBrush(new Rectangle(start_x + 1,i + 2, end_x - start_x + 1, 1), Color.FromArgb(red, green, start_b), Color.FromArgb(red, green, end_b), 0, false); 
-									g.FillRectangle(br,new Rectangle(start_x + 2,i + 2, end_x - start_x + 1 , 1));  
-								}
+									for (int i = start_y; i <= end_y; i++)                      //	For each horizontal line:
+									{
+										green = Round(255 - (255 * (double)i / (this.Height - 4))); //	green WILL change for each horizontal line drawn
 
-								break;
+										LinearGradientBrush br = new LinearGradientBrush(new Rectangle(start_x + 1, i + 2, end_x - start_x + 1, 1), Color.FromArgb(red, green, start_b), Color.FromArgb(red, green, end_b), 0, false);
+										g.FillRectangle(br, new Rectangle(start_x + 2, i + 2, end_x - start_x + 1, 1));
+									}
+
+									break;
 								//		  B=0,B=1,B=2,B=3.....B=100
 								//	R=100
 								//	R=99
@@ -3866,21 +3867,21 @@ namespace XPTable.Editors
 								//	R=97		  Green
 								//	...
 								//	R=0
-							case eDrawStyle.Green :
-					
-								green = m_rgb.G;;												//	Green is constant
-								int start_b2 = Round(255 * (double)start_x/(this.Width - 4));	//	Because we're drawing horizontal lines, B
-								int end_b2 = Round(255 * (double)end_x/(this.Width - 4));		//	will not change from line to line
+								case eDrawStyle.Green:
 
-								for ( int i = start_y; i <= end_y; i++ )						//	For each horizontal line:
-								{
-									red = Round(255 - (255 * (double)i/(this.Height - 4)));		//	red WILL change for each horizontal line drawn
+									green = m_rgb.G; ;                                              //	Green is constant
+									int start_b2 = Round(255 * (double)start_x / (this.Width - 4)); //	Because we're drawing horizontal lines, B
+									int end_b2 = Round(255 * (double)end_x / (this.Width - 4));     //	will not change from line to line
 
-									LinearGradientBrush br = new LinearGradientBrush(new Rectangle(start_x + 1,i + 2, end_x - start_x + 1, 1), Color.FromArgb(red, green, start_b2), Color.FromArgb(red, green, end_b2), 0, false); 
-									g.FillRectangle(br,new Rectangle(start_x + 2,i + 2, end_x - start_x + 1 , 1)); 
-								}
+									for (int i = start_y; i <= end_y; i++)                      //	For each horizontal line:
+									{
+										red = Round(255 - (255 * (double)i / (this.Height - 4)));       //	red WILL change for each horizontal line drawn
 
-								break;
+										LinearGradientBrush br = new LinearGradientBrush(new Rectangle(start_x + 1, i + 2, end_x - start_x + 1, 1), Color.FromArgb(red, green, start_b2), Color.FromArgb(red, green, end_b2), 0, false);
+										g.FillRectangle(br, new Rectangle(start_x + 2, i + 2, end_x - start_x + 1, 1));
+									}
+
+									break;
 								//		  R=0,R=1,R=2,R=3.....R=100
 								//	G=100
 								//	G=99
@@ -3888,21 +3889,22 @@ namespace XPTable.Editors
 								//	G=97		   Blue
 								//	...
 								//	G=0
-							case eDrawStyle.Blue :
-					
-								blue = m_rgb.B;;												//	Blue is constant
-								int start_r = Round(255 * (double)start_x/(this.Width - 4));	//	Because we're drawing horizontal lines, R
-								int end_r = Round(255 * (double)end_x/(this.Width - 4));		//	will not change from line to line
+								case eDrawStyle.Blue:
 
-								for ( int i = start_y; i <= end_y; i++ )						//	For each horizontal line:
-								{
-									green = Round(255 - (255 * (double)i/(this.Height - 4)));	//	green WILL change for each horizontal line drawn
+									blue = m_rgb.B; ;                                               //	Blue is constant
+									int start_r = Round(255 * (double)start_x / (this.Width - 4));  //	Because we're drawing horizontal lines, R
+									int end_r = Round(255 * (double)end_x / (this.Width - 4));      //	will not change from line to line
 
-									LinearGradientBrush br = new LinearGradientBrush(new Rectangle(start_x + 1,i + 2, end_x - start_x + 1, 1), Color.FromArgb(start_r, green, blue), Color.FromArgb(end_r, green, blue), 0, false); 
-									g.FillRectangle(br,new Rectangle(start_x + 2,i + 2, end_x - start_x + 1 , 1)); 
-								}
+									for (int i = start_y; i <= end_y; i++)                      //	For each horizontal line:
+									{
+										green = Round(255 - (255 * (double)i / (this.Height - 4))); //	green WILL change for each horizontal line drawn
 
-								break;
+										LinearGradientBrush br = new LinearGradientBrush(new Rectangle(start_x + 1, i + 2, end_x - start_x + 1, 1), Color.FromArgb(start_r, green, blue), Color.FromArgb(end_r, green, blue), 0, false);
+										g.FillRectangle(br, new Rectangle(start_x + 2, i + 2, end_x - start_x + 1, 1));
+									}
+
+									break;
+							}
 						}
 					}
 
@@ -3928,23 +3930,24 @@ namespace XPTable.Editors
 						m_iMarker_X = x;
 						m_iMarker_Y = y;
 
-						Graphics g = this.CreateGraphics();
+						using (Graphics g = this.CreateGraphics())
+						{
 
-						Pen pen;
-						AdobeColors.HSL _hsl = GetColor(x,y);	//	The selected color determines the color of the marker drawn over
-						//	it (black or white)
-						if ( _hsl.L < (double)200/255 )
-							pen = new Pen(Color.White);									//	White marker if selected color is dark
-						else if ( _hsl.H < (double)26/360 || _hsl.H > (double)200/360 )
-							if ( _hsl.S > (double)70/255 )
-								pen = new Pen(Color.White);
+							Pen pen;
+							AdobeColors.HSL _hsl = GetColor(x, y);  //	The selected color determines the color of the marker drawn over
+																	//	it (black or white)
+							if (_hsl.L < (double)200 / 255)
+								pen = new Pen(Color.White);                                 //	White marker if selected color is dark
+							else if (_hsl.H < (double)26 / 360 || _hsl.H > (double)200 / 360)
+								if (_hsl.S > (double)70 / 255)
+									pen = new Pen(Color.White);
+								else
+									pen = new Pen(Color.Black);                             //	Else use a black marker for lighter colors
 							else
-								pen = new Pen(Color.Black);								//	Else use a black marker for lighter colors
-						else
-							pen = new Pen(Color.Black);
+								pen = new Pen(Color.Black);
 
-						g.DrawEllipse(pen, x - 3, y - 3, 10, 10);						//	Draw the marker : 11 x 11 circle
-
+							g.DrawEllipse(pen, x - 3, y - 3, 10, 10);                       //	Draw the marker : 11 x 11 circle
+						}
 						DrawBorder();		//	Force the border to be redrawn, just in case the marker has been drawn over it.
 					}
 
@@ -3954,24 +3957,26 @@ namespace XPTable.Editors
 					/// </summary>
 					private void DrawBorder()
 					{
-						Graphics g = this.CreateGraphics();
+						using (Graphics g = this.CreateGraphics())
+						{
 
-						Pen pencil;
-			
-						//	To make the control look like Adobe Photoshop's the border around the control will be a gray line
-						//	on the top and left side, a white line on the bottom and right side, and a black rectangle (line) 
-						//	inside the gray/white rectangle
+							Pen pencil;
 
-						pencil = new Pen(Color.FromArgb(172,168,153));	//	The same gray color used by Photoshop
-						g.DrawLine(pencil, this.Width - 2, 0, 0, 0);	//	Draw top line
-						g.DrawLine(pencil, 0, 0, 0, this.Height - 2);	//	Draw left hand line
+							//	To make the control look like Adobe Photoshop's the border around the control will be a gray line
+							//	on the top and left side, a white line on the bottom and right side, and a black rectangle (line) 
+							//	inside the gray/white rectangle
 
-						pencil = new Pen(Color.White);
-						g.DrawLine(pencil, this.Width - 1, 0, this.Width - 1,this.Height - 1);	//	Draw right hand line
-						g.DrawLine(pencil, this.Width - 1,this.Height - 1, 0,this.Height - 1);	//	Draw bottome line
+							pencil = new Pen(Color.FromArgb(172, 168, 153));    //	The same gray color used by Photoshop
+							g.DrawLine(pencil, this.Width - 2, 0, 0, 0);    //	Draw top line
+							g.DrawLine(pencil, 0, 0, 0, this.Height - 2);   //	Draw left hand line
 
-						pencil = new Pen(Color.Black);
-						g.DrawRectangle(pencil, 1, 1, this.Width - 3, this.Height - 3);	//	Draw inner black rectangle
+							pencil = new Pen(Color.White);
+							g.DrawLine(pencil, this.Width - 1, 0, this.Width - 1, this.Height - 1); //	Draw right hand line
+							g.DrawLine(pencil, this.Width - 1, this.Height - 1, 0, this.Height - 1);    //	Draw bottome line
+
+							pencil = new Pen(Color.Black);
+							g.DrawRectangle(pencil, 1, 1, this.Width - 3, this.Height - 3); //	Draw inner black rectangle
+						}
 					}
 
 
@@ -4010,22 +4015,24 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Hue()
 					{
-						Graphics g = this.CreateGraphics();
-
-						AdobeColors.HSL hsl_start = new AdobeColors.HSL();
-						AdobeColors.HSL hsl_end = new AdobeColors.HSL();
-						hsl_start.H = m_hsl.H;
-						hsl_end.H = m_hsl.H;
-						hsl_start.S = 0.0;
-						hsl_end.S = 1.0;
-
-						for ( int i = 0; i < this.Height - 4; i++ )				//	For each horizontal line in the control:
+						using (Graphics g = this.CreateGraphics())
 						{
-							hsl_start.L = 1.0 - (double)i/(this.Height - 4);	//	Calculate luminance at this line (Hue and Saturation are constant)
-							hsl_end.L = hsl_start.L;
-				
-							LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2,2, this.Width - 4, 1), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 0, false); 
-							g.FillRectangle(br,new Rectangle(2,i + 2, this.Width - 4, 1)); 
+
+							AdobeColors.HSL hsl_start = new AdobeColors.HSL();
+							AdobeColors.HSL hsl_end = new AdobeColors.HSL();
+							hsl_start.H = m_hsl.H;
+							hsl_end.H = m_hsl.H;
+							hsl_start.S = 0.0;
+							hsl_end.S = 1.0;
+
+							for (int i = 0; i < this.Height - 4; i++)               //	For each horizontal line in the control:
+							{
+								hsl_start.L = 1.0 - (double)i / (this.Height - 4);  //	Calculate luminance at this line (Hue and Saturation are constant)
+								hsl_end.L = hsl_start.L;
+
+								LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2, 2, this.Width - 4, 1), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 0, false);
+								g.FillRectangle(br, new Rectangle(2, i + 2, this.Width - 4, 1));
+							}
 						}
 					}
 
@@ -4035,22 +4042,24 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Saturation()
 					{
-						Graphics g = this.CreateGraphics();
-
-						AdobeColors.HSL hsl_start = new AdobeColors.HSL();
-						AdobeColors.HSL hsl_end = new AdobeColors.HSL();
-						hsl_start.S = m_hsl.S;
-						hsl_end.S = m_hsl.S;
-						hsl_start.L = 1.0;
-						hsl_end.L = 0.0;
-
-						for ( int i = 0; i < this.Width - 4; i++ )		//	For each vertical line in the control:
+						using (Graphics g = this.CreateGraphics())
 						{
-							hsl_start.H = (double)i/(this.Width - 4);	//	Calculate Hue at this line (Saturation and Luminance are constant)
-							hsl_end.H = hsl_start.H;
-				
-							LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2,2, 1, this.Height - 4), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 90, false); 
-							g.FillRectangle(br,new Rectangle(i + 2, 2, 1, this.Height - 4)); 
+
+							AdobeColors.HSL hsl_start = new AdobeColors.HSL();
+							AdobeColors.HSL hsl_end = new AdobeColors.HSL();
+							hsl_start.S = m_hsl.S;
+							hsl_end.S = m_hsl.S;
+							hsl_start.L = 1.0;
+							hsl_end.L = 0.0;
+
+							for (int i = 0; i < this.Width - 4; i++)        //	For each vertical line in the control:
+							{
+								hsl_start.H = (double)i / (this.Width - 4); //	Calculate Hue at this line (Saturation and Luminance are constant)
+								hsl_end.H = hsl_start.H;
+
+								LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2, 2, 1, this.Height - 4), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 90, false);
+								g.FillRectangle(br, new Rectangle(i + 2, 2, 1, this.Height - 4));
+							}
 						}
 					}
 
@@ -4060,22 +4069,24 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Luminance()
 					{
-						Graphics g = this.CreateGraphics();
-
-						AdobeColors.HSL hsl_start = new AdobeColors.HSL();
-						AdobeColors.HSL hsl_end = new AdobeColors.HSL();
-						hsl_start.L = m_hsl.L;
-						hsl_end.L = m_hsl.L;
-						hsl_start.S = 1.0;
-						hsl_end.S = 0.0;
-
-						for ( int i = 0; i < this.Width - 4; i++ )		//	For each vertical line in the control:
+						using (Graphics g = this.CreateGraphics())
 						{
-							hsl_start.H = (double)i/(this.Width - 4);	//	Calculate Hue at this line (Saturation and Luminance are constant)
-							hsl_end.H = hsl_start.H;
-				
-							LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2,2, 1, this.Height - 4), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 90, false); 
-							g.FillRectangle(br,new Rectangle(i + 2, 2, 1, this.Height - 4)); 
+
+							AdobeColors.HSL hsl_start = new AdobeColors.HSL();
+							AdobeColors.HSL hsl_end = new AdobeColors.HSL();
+							hsl_start.L = m_hsl.L;
+							hsl_end.L = m_hsl.L;
+							hsl_start.S = 1.0;
+							hsl_end.S = 0.0;
+
+							for (int i = 0; i < this.Width - 4; i++)        //	For each vertical line in the control:
+							{
+								hsl_start.H = (double)i / (this.Width - 4); //	Calculate Hue at this line (Saturation and Luminance are constant)
+								hsl_end.H = hsl_start.H;
+
+								LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2, 2, 1, this.Height - 4), AdobeColors.HSL_to_RGB(hsl_start), AdobeColors.HSL_to_RGB(hsl_end), 90, false);
+								g.FillRectangle(br, new Rectangle(i + 2, 2, 1, this.Height - 4));
+							}
 						}
 					}
 
@@ -4085,17 +4096,19 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Red()
 					{
-						Graphics g = this.CreateGraphics();
-
-						int red = m_rgb.R;;
-
-						for ( int i = 0; i < this.Height - 4; i++ )				//	For each horizontal line in the control:
+						using (Graphics g = this.CreateGraphics())
 						{
-							//	Calculate Green at this line (Red and Blue are constant)
-							int green = Round(255 - (255 * (double)i/(this.Height - 4)));
 
-							LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2,2, this.Width - 4, 1), Color.FromArgb(red, green, 0), Color.FromArgb(red, green, 255), 0, false); 
-							g.FillRectangle(br,new Rectangle(2,i + 2, this.Width - 4, 1)); 
+							int red = m_rgb.R; ;
+
+							for (int i = 0; i < this.Height - 4; i++)               //	For each horizontal line in the control:
+							{
+								//	Calculate Green at this line (Red and Blue are constant)
+								int green = Round(255 - (255 * (double)i / (this.Height - 4)));
+
+								LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2, 2, this.Width - 4, 1), Color.FromArgb(red, green, 0), Color.FromArgb(red, green, 255), 0, false);
+								g.FillRectangle(br, new Rectangle(2, i + 2, this.Width - 4, 1));
+							}
 						}
 					}
 
@@ -4105,17 +4118,18 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Green()
 					{
-						Graphics g = this.CreateGraphics();
-
-						int green = m_rgb.G;;
-
-						for ( int i = 0; i < this.Height - 4; i++ )	//	For each horizontal line in the control:
+						using (Graphics g = this.CreateGraphics())
 						{
-							//	Calculate Red at this line (Green and Blue are constant)
-							int red = Round(255 - (255 * (double)i/(this.Height - 4)));
+							int green = m_rgb.G; ;
 
-							LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2,2, this.Width - 4, 1), Color.FromArgb(red, green, 0), Color.FromArgb(red, green, 255), 0, false); 
-							g.FillRectangle(br,new Rectangle(2,i + 2, this.Width - 4, 1)); 
+							for (int i = 0; i < this.Height - 4; i++)   //	For each horizontal line in the control:
+							{
+								//	Calculate Red at this line (Green and Blue are constant)
+								int red = Round(255 - (255 * (double)i / (this.Height - 4)));
+
+								LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2, 2, this.Width - 4, 1), Color.FromArgb(red, green, 0), Color.FromArgb(red, green, 255), 0, false);
+								g.FillRectangle(br, new Rectangle(2, i + 2, this.Width - 4, 1));
+							}
 						}
 					}
 
@@ -4125,17 +4139,19 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Blue()
 					{
-						Graphics g = this.CreateGraphics();
-
-						int blue = m_rgb.B;;
-
-						for ( int i = 0; i < this.Height - 4; i++ )	//	For each horizontal line in the control:
+						using (Graphics g = this.CreateGraphics())
 						{
-							//	Calculate Green at this line (Red and Blue are constant)
-							int green = Round(255 - (255 * (double)i/(this.Height - 4)));
 
-							LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2,2, this.Width - 4, 1), Color.FromArgb(0, green, blue), Color.FromArgb(255, green, blue), 0, false); 
-							g.FillRectangle(br,new Rectangle(2,i + 2, this.Width - 4, 1)); 
+							int blue = m_rgb.B; ;
+
+							for (int i = 0; i < this.Height - 4; i++)   //	For each horizontal line in the control:
+							{
+								//	Calculate Green at this line (Red and Blue are constant)
+								int green = Round(255 - (255 * (double)i / (this.Height - 4)));
+
+								LinearGradientBrush br = new LinearGradientBrush(new Rectangle(2, 2, this.Width - 4, 1), Color.FromArgb(0, green, blue), Color.FromArgb(255, green, blue), 0, false);
+								g.FillRectangle(br, new Rectangle(2, i + 2, this.Width - 4, 1));
+							}
 						}
 					}
 
@@ -4588,10 +4604,12 @@ namespace XPTable.Editors
 					/// </summary>
 					private void ClearSlider()
 					{
-						Graphics g = this.CreateGraphics();
-						Brush brush = System.Drawing.SystemBrushes.Control;
-						g.FillRectangle(brush, 0, 0, 8, this.Height);				//	clear left hand slider
-						g.FillRectangle(brush, this.Width - 8, 0, 8, this.Height);	//	clear right hand slider
+						using (Graphics g = this.CreateGraphics())
+						{
+							Brush brush = System.Drawing.SystemBrushes.Control;
+							g.FillRectangle(brush, 0, 0, 8, this.Height);               //	clear left hand slider
+							g.FillRectangle(brush, this.Width - 8, 0, 8, this.Height);  //	clear right hand slider
+						}
 					}
 
 
@@ -4613,39 +4631,40 @@ namespace XPTable.Editors
 
 						m_iMarker_Start_Y = position;	//	Update the controls marker position
 
-						this.ClearSlider();		//	Remove old slider
+						this.ClearSlider();     //	Remove old slider
 
-						Graphics g = this.CreateGraphics();
+						using (Graphics g = this.CreateGraphics())
+						{
 
-						Pen pencil = new Pen(Color.FromArgb(116,114,106));	//	Same gray color Photoshop uses
-						Brush brush = Brushes.White;
-			
-						Point[] arrow = new Point[7];				//	 GGG
-						arrow[0] = new Point(1,position);			//	G   G
-						arrow[1] = new Point(3,position);			//	G    G
-						arrow[2] = new Point(7,position + 4);		//	G     G
-						arrow[3] = new Point(3,position + 8);		//	G      G
-						arrow[4] = new Point(1,position + 8);		//	G     G
-						arrow[5] = new Point(0,position + 7);		//	G    G
-						arrow[6] = new Point(0,position + 1);		//	G   G
-						//	 GGG
+							Pen pencil = new Pen(Color.FromArgb(116, 114, 106));    //	Same gray color Photoshop uses
+							Brush brush = Brushes.White;
 
-						g.FillPolygon(brush, arrow);	//	Fill left arrow with white
-						g.DrawPolygon(pencil, arrow);	//	Draw left arrow border with gray
+							Point[] arrow = new Point[7];               //	 GGG
+							arrow[0] = new Point(1, position);          //	G   G
+							arrow[1] = new Point(3, position);          //	G    G
+							arrow[2] = new Point(7, position + 4);      //	G     G
+							arrow[3] = new Point(3, position + 8);      //	G      G
+							arrow[4] = new Point(1, position + 8);      //	G     G
+							arrow[5] = new Point(0, position + 7);      //	G    G
+							arrow[6] = new Point(0, position + 1);      //	G   G
+																		//	 GGG
 
-						//	    GGG
-						arrow[0] = new Point(this.Width - 2,position);		//	   G   G
-						arrow[1] = new Point(this.Width - 4,position);		//	  G    G
-						arrow[2] = new Point(this.Width - 8,position + 4);	//	 G     G
-						arrow[3] = new Point(this.Width - 4,position + 8);	//	G      G
-						arrow[4] = new Point(this.Width - 2,position + 8);	//	 G     G
-						arrow[5] = new Point(this.Width - 1,position + 7);	//	  G    G
-						arrow[6] = new Point(this.Width - 1,position + 1);	//	   G   G
-						//	    GGG
+							g.FillPolygon(brush, arrow);    //	Fill left arrow with white
+							g.DrawPolygon(pencil, arrow);   //	Draw left arrow border with gray
 
-						g.FillPolygon(brush, arrow);	//	Fill right arrow with white
-						g.DrawPolygon(pencil, arrow);	//	Draw right arrow border with gray
+							//	    GGG
+							arrow[0] = new Point(this.Width - 2, position);     //	   G   G
+							arrow[1] = new Point(this.Width - 4, position);     //	  G    G
+							arrow[2] = new Point(this.Width - 8, position + 4); //	 G     G
+							arrow[3] = new Point(this.Width - 4, position + 8); //	G      G
+							arrow[4] = new Point(this.Width - 2, position + 8); //	 G     G
+							arrow[5] = new Point(this.Width - 1, position + 7); //	  G    G
+							arrow[6] = new Point(this.Width - 1, position + 1); //	   G   G
+																				//	    GGG
 
+							g.FillPolygon(brush, arrow);    //	Fill right arrow with white
+							g.DrawPolygon(pencil, arrow);   //	Draw right arrow border with gray
+						}
 					}
 
 
@@ -4655,24 +4674,26 @@ namespace XPTable.Editors
 					/// </summary>
 					private void DrawBorder()
 					{
-						Graphics g = this.CreateGraphics();
+						using (Graphics g = this.CreateGraphics())
+						{
 
-						Pen pencil;
-			
-						//	To make the control look like Adobe Photoshop's the border around the control will be a gray line
-						//	on the top and left side, a white line on the bottom and right side, and a black rectangle (line) 
-						//	inside the gray/white rectangle
+							Pen pencil;
 
-						pencil = new Pen(Color.FromArgb(172,168,153));	//	The same gray color used by Photoshop
-						g.DrawLine(pencil, this.Width - 10, 2, 9, 2);	//	Draw top line
-						g.DrawLine(pencil, 9, 2, 9, this.Height - 4);	//	Draw left hand line
+							//	To make the control look like Adobe Photoshop's the border around the control will be a gray line
+							//	on the top and left side, a white line on the bottom and right side, and a black rectangle (line) 
+							//	inside the gray/white rectangle
 
-						pencil = new Pen(Color.White);
-						g.DrawLine(pencil, this.Width - 9, 2, this.Width - 9,this.Height - 3);	//	Draw right hand line
-						g.DrawLine(pencil, this.Width - 9,this.Height - 3, 9,this.Height - 3);	//	Draw bottome line
+							pencil = new Pen(Color.FromArgb(172, 168, 153));    //	The same gray color used by Photoshop
+							g.DrawLine(pencil, this.Width - 10, 2, 9, 2);   //	Draw top line
+							g.DrawLine(pencil, 9, 2, 9, this.Height - 4);   //	Draw left hand line
 
-						pencil = new Pen(Color.Black);
-						g.DrawRectangle(pencil, 10, 3, this.Width - 20, this.Height - 7);	//	Draw inner black rectangle
+							pencil = new Pen(Color.White);
+							g.DrawLine(pencil, this.Width - 9, 2, this.Width - 9, this.Height - 3); //	Draw right hand line
+							g.DrawLine(pencil, this.Width - 9, this.Height - 3, 9, this.Height - 3);    //	Draw bottome line
+
+							pencil = new Pen(Color.Black);
+							g.DrawRectangle(pencil, 10, 3, this.Width - 20, this.Height - 7);   //	Draw inner black rectangle
+						}
 					}
 
 
@@ -4716,18 +4737,19 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Hue()
 					{
-						Graphics g = this.CreateGraphics();
-
-						AdobeColors.HSL _hsl = new AdobeColors.HSL();
-						_hsl.S = 1.0;	//	S and L will both be at 100% for this DrawStyle
-						_hsl.L = 1.0;
-
-						for ( int i = 0; i < this.Height - 8; i++ )	//	i represents the current line of pixels we want to draw horizontally
+						using (Graphics g = this.CreateGraphics())
 						{
-							_hsl.H = 1.0 - (double)i/(this.Height - 8);			//	H (hue) is based on the current vertical position
-							Pen pen = new Pen(AdobeColors.HSL_to_RGB(_hsl));	//	Get the Color for this line
+							AdobeColors.HSL _hsl = new AdobeColors.HSL();
+							_hsl.S = 1.0;   //	S and L will both be at 100% for this DrawStyle
+							_hsl.L = 1.0;
 
-							g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);	//	Draw the line and loop back for next line
+							for (int i = 0; i < this.Height - 8; i++)   //	i represents the current line of pixels we want to draw horizontally
+							{
+								_hsl.H = 1.0 - (double)i / (this.Height - 8);           //	H (hue) is based on the current vertical position
+								Pen pen = new Pen(AdobeColors.HSL_to_RGB(_hsl));    //	Get the Color for this line
+
+								g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4); //	Draw the line and loop back for next line
+							}
 						}
 					}
 
@@ -4738,18 +4760,20 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Saturation()
 					{
-						Graphics g = this.CreateGraphics();
-
-						AdobeColors.HSL _hsl = new AdobeColors.HSL();
-						_hsl.H = m_hsl.H;	//	Use the H and L values of the current color (m_hsl)
-						_hsl.L = m_hsl.L;
-
-						for ( int i = 0; i < this.Height - 8; i++ ) //	i represents the current line of pixels we want to draw horizontally
+						using (Graphics g = this.CreateGraphics())
 						{
-							_hsl.S = 1.0 - (double)i/(this.Height - 8);			//	S (Saturation) is based on the current vertical position
-							Pen pen = new Pen(AdobeColors.HSL_to_RGB(_hsl));	//	Get the Color for this line
 
-							g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);	//	Draw the line and loop back for next line
+							AdobeColors.HSL _hsl = new AdobeColors.HSL();
+							_hsl.H = m_hsl.H;   //	Use the H and L values of the current color (m_hsl)
+							_hsl.L = m_hsl.L;
+
+							for (int i = 0; i < this.Height - 8; i++) //	i represents the current line of pixels we want to draw horizontally
+							{
+								_hsl.S = 1.0 - (double)i / (this.Height - 8);           //	S (Saturation) is based on the current vertical position
+								Pen pen = new Pen(AdobeColors.HSL_to_RGB(_hsl));    //	Get the Color for this line
+
+								g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4); //	Draw the line and loop back for next line
+							}
 						}
 					}
 
@@ -4760,18 +4784,20 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Luminance()
 					{
-						Graphics g = this.CreateGraphics();
-
-						AdobeColors.HSL _hsl = new AdobeColors.HSL();
-						_hsl.H = m_hsl.H;	//	Use the H and S values of the current color (m_hsl)
-						_hsl.S = m_hsl.S;
-
-						for ( int i = 0; i < this.Height - 8; i++ ) //	i represents the current line of pixels we want to draw horizontally
+						using (Graphics g = this.CreateGraphics())
 						{
-							_hsl.L = 1.0 - (double)i/(this.Height - 8);			//	L (Luminance) is based on the current vertical position
-							Pen pen = new Pen(AdobeColors.HSL_to_RGB(_hsl));	//	Get the Color for this line
 
-							g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);	//	Draw the line and loop back for next line
+							AdobeColors.HSL _hsl = new AdobeColors.HSL();
+							_hsl.H = m_hsl.H;   //	Use the H and S values of the current color (m_hsl)
+							_hsl.S = m_hsl.S;
+
+							for (int i = 0; i < this.Height - 8; i++) //	i represents the current line of pixels we want to draw horizontally
+							{
+								_hsl.L = 1.0 - (double)i / (this.Height - 8);           //	L (Luminance) is based on the current vertical position
+								Pen pen = new Pen(AdobeColors.HSL_to_RGB(_hsl));    //	Get the Color for this line
+
+								g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4); //	Draw the line and loop back for next line
+							}
 						}
 					}
 
@@ -4782,14 +4808,16 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Red()
 					{
-						Graphics g = this.CreateGraphics();
-
-						for ( int i = 0; i < this.Height - 8; i++ ) //	i represents the current line of pixels we want to draw horizontally
+						using (Graphics g = this.CreateGraphics())
 						{
-							int red = 255 - Round(255 * (double)i/(this.Height - 8));	//	red is based on the current vertical position
-							Pen pen = new Pen(Color.FromArgb(red, m_rgb.G, m_rgb.B));	//	Get the Color for this line
 
-							g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);			//	Draw the line and loop back for next line
+							for (int i = 0; i < this.Height - 8; i++) //	i represents the current line of pixels we want to draw horizontally
+							{
+								int red = 255 - Round(255 * (double)i / (this.Height - 8)); //	red is based on the current vertical position
+								Pen pen = new Pen(Color.FromArgb(red, m_rgb.G, m_rgb.B));   //	Get the Color for this line
+
+								g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);         //	Draw the line and loop back for next line
+							}
 						}
 					}
 
@@ -4800,14 +4828,16 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Green()
 					{
-						Graphics g = this.CreateGraphics();
-
-						for ( int i = 0; i < this.Height - 8; i++ ) //	i represents the current line of pixels we want to draw horizontally
+						using (Graphics g = this.CreateGraphics())
 						{
-							int green = 255 - Round(255 * (double)i/(this.Height - 8));	//	green is based on the current vertical position
-							Pen pen = new Pen(Color.FromArgb(m_rgb.R, green, m_rgb.B));	//	Get the Color for this line
 
-							g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);			//	Draw the line and loop back for next line
+							for (int i = 0; i < this.Height - 8; i++) //	i represents the current line of pixels we want to draw horizontally
+							{
+								int green = 255 - Round(255 * (double)i / (this.Height - 8));   //	green is based on the current vertical position
+								Pen pen = new Pen(Color.FromArgb(m_rgb.R, green, m_rgb.B)); //	Get the Color for this line
+
+								g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);         //	Draw the line and loop back for next line
+							}
 						}
 					}
 
@@ -4818,14 +4848,16 @@ namespace XPTable.Editors
 					/// </summary>
 					private void Draw_Style_Blue()
 					{
-						Graphics g = this.CreateGraphics();
-
-						for ( int i = 0; i < this.Height - 8; i++ ) //	i represents the current line of pixels we want to draw horizontally
+						using (Graphics g = this.CreateGraphics())
 						{
-							int blue = 255 - Round(255 * (double)i/(this.Height - 8));	//	green is based on the current vertical position
-							Pen pen = new Pen(Color.FromArgb(m_rgb.R, m_rgb.G, blue));	//	Get the Color for this line
 
-							g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);			//	Draw the line and loop back for next line
+							for (int i = 0; i < this.Height - 8; i++) //	i represents the current line of pixels we want to draw horizontally
+							{
+								int blue = 255 - Round(255 * (double)i / (this.Height - 8));    //	green is based on the current vertical position
+								Pen pen = new Pen(Color.FromArgb(m_rgb.R, m_rgb.G, blue));  //	Get the Color for this line
+
+								g.DrawLine(pen, 11, i + 4, this.Width - 11, i + 4);         //	Draw the line and loop back for next line
+							}
 						}
 					}
 
@@ -5127,7 +5159,7 @@ namespace XPTable.Editors
 					public static HSL RGB_to_HSL (Color c) 
 					{ 
 						HSL hsl =  new HSL(); 
-          
+		  
 						int Max, Min, Diff, Sum;
 
 						//	Of our RGB values, assign the highest value to Max, and the Smallest to Min
