@@ -420,7 +420,7 @@ namespace XPTable.Models
 		/// <summary>
 		/// Occurs before an internally handled row move operation during DragDrop.
 		/// </summary>
-		public event DragDropCanMoveRowEventHandler DragDropCanMoveRowEvent;
+		public event DragDropRowGetAllowedDropEffectsHandler DragDropRowGetAllowedDropEffectsEvent;
 
 
 		#endregion
@@ -3388,11 +3388,11 @@ namespace XPTable.Models
 				DragDropRowMovedEvent(row, srcIndex, destIndex);
 		}
 
-		internal bool DragDropCanMoveRow(Row row, int rowIndex)
+		internal DragDropEffects DragDropRowGetAllowedDropEffects(Row row, int rowIndex)
 		{
-			if (DragDropCanMoveRowEvent != null)
-				return DragDropCanMoveRowEvent(row, rowIndex);
-			return true;
+			if (DragDropRowGetAllowedDropEffectsEvent != null)
+				return DragDropRowGetAllowedDropEffectsEvent(row, rowIndex);
+			return DragDropEffects.All;
 		}
 		#endregion
 

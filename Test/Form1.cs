@@ -159,9 +159,9 @@ namespace xptable_test
 			Debug.WriteLine("xp_table::DragLeave");
 		}
 
-		private bool xp_table_DragDropCanMoveRowEvent(Row row, int rowIndex)
+		private DragDropEffects xp_table_DragDropCanMoveRowEvent(Row row, int rowIndex)
 		{
-			return rowIndex != 2;
+			return (rowIndex != 2) ? DragDropEffects.Move : DragDropEffects.None;
 		}
 	}
 }

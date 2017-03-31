@@ -127,7 +127,7 @@ namespace xptable_test
 			this.xp_table.DragLeaveExternalTypeEvent += new XPTable.Models.DragLeaveExternalTypeEventHandler(this.xp_table_DragLeaveExternalTypeEvent);
 			this.xp_table.DragDropRowInsertedAtEvent += new XPTable.Models.DragDropRowInsertedAtEventHandler(this.xp_table_DragDropRowInsertedAtEvent);
 			this.xp_table.DragDropRowMovedEvent += new XPTable.Models.DragDropRowMovedEventHandler(this.xp_table_DragDropRowMovedEvent);
-			this.xp_table.DragDropCanMoveRowEvent += new XPTable.Models.DragDropCanMoveRowEventHandler(this.xp_table_DragDropCanMoveRowEvent);
+			this.xp_table.DragDropRowGetAllowedDropEffectsEvent += new XPTable.Models.DragDropRowGetAllowedDropEffectsHandler(this.xp_table_DragDropCanMoveRowEvent);
 			// 
 			// column_model
 			// 

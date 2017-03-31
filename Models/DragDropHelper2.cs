@@ -24,16 +24,20 @@ namespace XPTable.Models
 
 	class DragDropHelper2
 	{
-		DragDropEffects allowed_effects_ = DragDropEffects.Move | DragDropEffects.Scroll;
 		Table table_;
 		IDragDropRenderer renderer_;
 		private bool drag_drop_mode_ = false;
 		private MouseButtons start_mouse_button_ = MouseButtons.None;
 		private Row drag_row_ = null;
 		private Row last_hover_ = null;
+		private DragDropEffects allowed_effects_ = DragDropEffects.None;
 		private Rectangle drag_threshold_bounds_;
 		private Form form_;
 		private string drag_type_;
+		private int last_timer_ = 0;
+		private int initial_scroll_delay_ = 300;
+		private int min_scroll_delay_ = 100;
+		private int scroll_delay_;
 
 		public DragDropHelper2(Table table)
 		{
@@ -89,7 +93,8 @@ namespace XPTable.Models
 			if (start_mouse_button_ == MouseButtons.None)
 				return;
 			Row row = table_.TableModel.Rows[row_idx];
-			if (!table_.DragDropCanMoveRow(row, row_idx))
+			allowed_effects_ = table_.DragDropRowGetAllowedDropEffects(row, row_idx);
+			if (DragDropEffects.None == allowed_effects_)
 				return;
 			drag_row_ = row;
 			Debug.WriteLine("*** prepare drag: " + row_idx);
@@ -138,6 +143,7 @@ namespace XPTable.Models
 		{
 			Debug.WriteLine("*** begin drag: " + drag_row_.Index);
 			drag_drop_mode_ = true;
+			scroll_delay_ = initial_scroll_delay_;
 		}
 
 		private void finish_DragDrop()
@@ -189,6 +195,8 @@ namespace XPTable.Models
 
 		void table_DragOver(object sender, DragEventArgs drgevent)
 		{
+			last_timer_ = Environment.TickCount;
+			scroll_delay_ = initial_scroll_delay_;
 			if (drgevent.Data.GetDataPresent(drag_type_, false))
 			{
 				DragItemData data = (DragItemData)drgevent.Data.GetData(drag_type_, false);
@@ -302,12 +310,53 @@ namespace XPTable.Models
 
 		private void table_GiveFeedback(object sender, GiveFeedbackEventArgs e)
 		{
-			Debug.WriteLine("table::GiveFeedback");
-			//TODO fix me: scroll if need it!?
+			int timer = Environment.TickCount;
+			if (timer - last_timer_ < scroll_delay_)
+				return;
+			last_timer_ = timer;
+			if (!table_.Scrollable || !table_.VScroll)
+				return;
+			scroll_delay_ = (scroll_delay_ * 2) / 3;
+			if (scroll_delay_ < min_scroll_delay_)
+				scroll_delay_ = min_scroll_delay_;
+			Point pt = table_.PointToClient(Control.MousePosition);
+			Debug.WriteLine("table::GiveFeedback, y=" + pt.Y);
+			if (pt.Y < 0)
+			{
+				int idx = table_.TopIndex - 1;
+				if (idx < 0)
+					idx = 0;
+				table_.EnsureVisible(idx, -1);
+				return;
+			}
+			if (pt.Y > table_.Height)
+			{
+				int idx = table_.TopIndex + table_.GetVisibleRowCount();
+				if (idx >= table_.TableModel.Rows.Count)
+					idx = table_.TableModel.Rows.Count - 1;
+				table_.EnsureVisible(idx, -1);
+			}
+			/*
+			VScrollBar vbar = table_.VerticalScrollBar;
+			if (null == vbar)
+				return;
+			int v = vbar.Value;
+			if (pt.Y < 0)
+			{
+				--v;
+				if (v >= vbar.Minimum)
+					vbar.Value = v;
+				return;
+			}
+			if (pt.Y > table_.Height)
+			{BUG: scroll too high then reset to 0
+				++v;
+				if (v <= vbar.Maximum)
+					vbar.Value = v;
+			}
+			*/
 		}
-
 	}
-
 	#region Delegates
 
 	/// <summary>
@@ -346,7 +395,7 @@ namespace XPTable.Models
 	/// <summary>
 	/// Represents the method that will handle DragLeave functionality when the data is an external type.
 	/// </summary>
-	public delegate bool DragDropCanMoveRowEventHandler(Row row, int rowIndex);
+	public delegate DragDropEffects DragDropRowGetAllowedDropEffectsHandler(Row row, int rowIndex);
 
 	#endregion
 }

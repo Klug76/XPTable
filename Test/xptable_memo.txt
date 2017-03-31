@@ -10,10 +10,11 @@ There were a few bugs in v1.2.2 that broke when using group columns:
 
 .BUG: drag cause row mess and crash!
 .rewrite drag n drop
-	. auto-scrolling during drag
-		.http://blog.scottlogic.com/2012/05/29/developing-an-extended-drag-and-drop-treeview-control-in-c-net.html
-		.by timer
 	.BUG: focused cell frame broken
+	+. auto-scrolling during drag
+		.http://blog.scottlogic.com/2012/05/29/developing-an-extended-drag-and-drop-treeview-control-in-c-net.html
+		!.by timer
+		.by GiveFeedback
 	. ?query drop to dst?
 	+. Escape must cancel drag
 	+. only move rows, newer add
