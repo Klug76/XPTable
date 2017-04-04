@@ -97,7 +97,7 @@ namespace XPTable.Models
 			if (DragDropEffects.None == allowed_effects_)
 				return;
 			drag_row_ = row;
-			Debug.WriteLine("*** prepare drag: " + row_idx);
+			//Debug.WriteLine("*** prepare drag: " + row_idx);
 			Size drag_size = SystemInformation.DragSize;
 			drag_threshold_bounds_ = new Rectangle(new Point(e.X - drag_size.Width / 2, e.Y - drag_size.Height / 2), drag_size);
 			Form parent = table_.FindForm();
@@ -141,14 +141,14 @@ namespace XPTable.Models
 
 		private void prepare_DragDrop()
 		{
-			Debug.WriteLine("*** begin drag: " + drag_row_.Index);
+			//Debug.WriteLine("*** begin drag: " + drag_row_.Index);
 			drag_drop_mode_ = true;
 			scroll_delay_ = initial_scroll_delay_;
 		}
 
 		private void finish_DragDrop()
 		{
-			Debug.WriteLine("*** end drag: " + drag_row_.Index);
+			//Debug.WriteLine("*** end drag: " + drag_row_.Index);
 			reset_DragDrop();
 			remove_Deactivate_Listener();
 		}
@@ -184,7 +184,7 @@ namespace XPTable.Models
 				DragItemData data = (DragItemData)drgevent.Data.GetData(drag_type_, false);
 				if ((data != null) && (data.table_ == table_))
 				{
-					Debug.WriteLine("*** drag ENTER");
+					//Debug.WriteLine("*** drag ENTER");
 					effect = DragDropEffects.Move;
 				}
 				drgevent.Effect = effect;
@@ -203,7 +203,7 @@ namespace XPTable.Models
 				if ((data != null) && (data.table_ == table_))
 				{
 					int hover_idx = find_Row(drgevent);
-					Debug.WriteLine("*** hover idx: " + hover_idx);
+					//Debug.WriteLine("*** hover idx: " + hover_idx);
 					if ((hover_idx >= 0) && (hover_idx < table_.TableModel.Rows.Count))
 					{
 						table_.EnsureVisible(hover_idx, -1);//:may scroll
@@ -266,12 +266,12 @@ namespace XPTable.Models
 		{
 			if (drgevent.Data.GetDataPresent(drag_type_, false))
 			{
-				Debug.WriteLine("*** drag DROP");
+				//Debug.WriteLine("*** drag DROP");
 				DragItemData data = (DragItemData)drgevent.Data.GetData(drag_type_, false);
 				if ((data != null) && (data.table_ == table_))
 				{
 					int hover_idx = find_Row(drgevent);
-					Debug.WriteLine("*** drop idx: " + hover_idx);
+					//Debug.WriteLine("*** drop idx: " + hover_idx);
 					if ((hover_idx >= 0) && (hover_idx < table_.TableModel.Rows.Count))
 					{
 						Row hover_row = table_.TableModel.Rows[hover_idx];
@@ -280,12 +280,14 @@ namespace XPTable.Models
 							int src_idx = table_.TableModel.Rows.IndexOf(drag_row_);
 							if ((src_idx >= 0) && (src_idx != hover_idx))
 							{
+								int col = table_.FocusedCell.Column;
+								if (col < 0)
+									col = 0;
 								table_.TableModel.Rows.RemoveAt(src_idx);
 								table_.TableModel.Rows.Insert(hover_idx, drag_row_);
 								table_.TableModel.Selections.Clear();
-								table_.TableModel.Selections.AddCell(hover_idx, -1);
-								//TODO fix me: focus rect broken
-								//?table_.FocusedCell = new CellPos(hover_idx, 0);
+								table_.FocusedCell = new CellPos(hover_idx, col);
+								table_.TableModel.Selections.SelectCell(table_.FocusedCell);
 								table_.DragDropRowMoved(drag_row_, src_idx, hover_idx);
 							}
 						}
@@ -301,7 +303,7 @@ namespace XPTable.Models
 		{
 			if (drag_drop_mode_)
 			{
-				Debug.WriteLine("*** drag LEAVE");
+				//Debug.WriteLine("*** drag LEAVE");
 				clear_Drop_Hover();
 				return;
 			}
@@ -320,7 +322,7 @@ namespace XPTable.Models
 			if (scroll_delay_ < min_scroll_delay_)
 				scroll_delay_ = min_scroll_delay_;
 			Point pt = table_.PointToClient(Control.MousePosition);
-			Debug.WriteLine("table::GiveFeedback, y=" + pt.Y);
+			//Debug.WriteLine("table::GiveFeedback, y=" + pt.Y);
 			if (pt.Y < 0)
 			{
 				int idx = table_.TopIndex - 1;
