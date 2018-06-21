@@ -8136,7 +8136,7 @@ namespace XPTable.Models
 
 			bool isEnabled = false;
 			bool isEditable = false;
-			if (currentCell != null)
+			if ((currentCell != null) && (currentRow != null))
 			{
 				isEditable = currentCell.Editable && currentRow.Editable && currentColumn.Editable;
 				isEnabled = currentCell.Enabled && currentRow.Enabled && currentColumn.Enabled;
@@ -8157,7 +8157,7 @@ namespace XPTable.Models
 				}
 			}
 
-			if ((currentRow.Cells != null) && (column < currentRow.Cells.Count))
+			if ((currentRow?.Cells != null) && (column < currentRow.Cells.Count))
 			{
 				// is the cell selected
 				bool isSelected = false;
