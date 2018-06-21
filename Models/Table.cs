@@ -8157,7 +8157,7 @@ namespace XPTable.Models
 				}
 			}
 
-			if (column < currentRow.Cells.Count)
+			if ((currentRow.Cells != null) && (column < currentRow.Cells.Count))
 			{
 				// is the cell selected
 				bool isSelected = false;

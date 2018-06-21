@@ -23,15 +23,15 @@ namespace xptable_test
 			//column_model.Columns.Add(new TextColumn("Id"));
 			//column_model.Columns.Add(new TextColumn("Text"));
 
-			for (int i = 0; i < 24; ++i)
+			for (int i = 0; i < 10; ++i)
 			{
 				var row = new Row();
 				add_Cells(row, i + 1);
 				table_model.Rows.Add(row);
 				++last_idx_;
 			}
-			/*
-			 * +group
+			
+			// +group
 			var last_row = new Row();
 			//add_Cells(last_row, 100);
 			last_row.Cells.Add(new Cell());
@@ -41,13 +41,13 @@ namespace xptable_test
 
 			last_row.Editable = false;
 			table_model.Rows.Add(last_row);
-			for (int i = 0; i < 5; ++i)
+			for (int i = 0; i < 16; ++i)
 			{
 				var sub_row = new Row();
 				add_Cells(sub_row, 200 + i);
 				last_row.SubRows.Add(sub_row);
 			}
-			*/
+			
 		}
 
 		private void add_Cells(Row row, int idx)
@@ -161,7 +161,7 @@ namespace xptable_test
 
 		private DragDropEffects xp_table_DragDropCanMoveRowEvent(Row row, int rowIndex)
 		{
-			return (rowIndex != 2) ? DragDropEffects.Move : DragDropEffects.None;
+			return row.Editable ? DragDropEffects.Move : DragDropEffects.None;
 		}
 	}
 }

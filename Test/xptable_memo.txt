@@ -7,9 +7,11 @@ There were a few bugs in v1.2.2 that broke when using group columns:
 
  - Table has a scrollbar bug, secondary to having negative visible rows, that would cause infinite stack recursion when trying to update the scrollbar position in UpdateScrollBars(). visibleRowCount would be a negative number and so it would try to set the scrollbar position to a negative value. The scrollbar would see that it is setting a negative value, fix it up to zero, and then fire its changed event. UpdateScrollBars usually fires again, but normally it does nothing because it sets the scrollbar to a value that it is already, and so the next event doesn't fire and UpdateScrollBars doesn't run again, thus ending the recursion. However, setting the scrollbar to a negative value causes it to check for equality *before* fixing up the value and storing it. It would see that eg, -1 != 0, decide to do the change (and thus eventually fire the event), fix up the value to 0 ... and save 0 on top of 0 and fire the changed event. Since UpdateScrollBars() is in the event's path, it always fires, and we end up in an infinite loop. Yuck.
 
+.how to drop file to the specific row?
 
-.BUG: drag cause row mess and crash!
-.rewrite drag n drop
++.BUG: drag cause row mess and crash!
+	=>
++.rewrite drag n drop
 	.BUG: focused cell frame broken
 	+. auto-scrolling during drag
 		.http://blog.scottlogic.com/2012/05/29/developing-an-extended-drag-and-drop-treeview-control-in-c-net.html
