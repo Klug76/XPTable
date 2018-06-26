@@ -165,9 +165,9 @@ namespace XPTable.Models
 		{
 			if (form_ != null)
 			{
-				Form parent = form_;
+				Form f = form_;
 				form_ = null;
-				parent.Deactivate -= on_Deactivate;
+				f.Deactivate -= on_Deactivate;
 			}
 		}
 
@@ -197,30 +197,36 @@ namespace XPTable.Models
 		{
 			last_timer_ = Environment.TickCount;
 			scroll_delay_ = initial_scroll_delay_;
+			int hover_idx = find_DragDrop_Target_Row(drgevent);
+			Row hover_row = null;
+			if ((hover_idx >= 0) && (hover_idx < table_.TableModel.Rows.Count))
+			{
+				hover_row = table_.TableModel.Rows[hover_idx];
+				table_.EnsureVisible(hover_idx, -1);//:may scroll
+			}
 			if (drgevent.Data.GetDataPresent(drag_type_, false))
 			{
+				DragDropEffects effect = DragDropEffects.None;
 				DragItemData data = (DragItemData)drgevent.Data.GetData(drag_type_, false);
 				if ((data != null) && (data.table_ == table_))
 				{
-					int hover_idx = find_Row(drgevent);
 					//Debug.WriteLine("*** hover idx: " + hover_idx);
-					if ((hover_idx >= 0) && (hover_idx < table_.TableModel.Rows.Count))
-					{
-						table_.EnsureVisible(hover_idx, -1);//:may scroll
-						Row hover_row = table_.TableModel.Rows[hover_idx];
-						if (hover_row != drag_row_)
-						{
-							drgevent.Effect = DragDropEffects.Move;
-							paint_Drop_Hover(hover_idx, hover_row);
-							return;
-						}
-					}
+					if ((hover_row != null) && (hover_row != drag_row_))
+						effect = DragDropEffects.Move;
 				}
-				clear_Drop_Hover();
-				drgevent.Effect = DragDropEffects.None;
-				return;
+				if (DragDropEffects.Move == effect)
+					paint_Drop_Hover(hover_idx, hover_row);
+				else
+					clear_Drop_Hover();
+				drgevent.Effect = effect;
+				return;//:internal type handled
 			}
-			table_.DragOverExternalType(sender, drgevent);
+			if (table_.DragOverExternalType(sender, drgevent, hover_row, hover_idx))
+				return;
+			if (drgevent.Effect != DragDropEffects.None)
+				paint_Drop_Hover(hover_idx, hover_row);
+			else
+				clear_Drop_Hover();
 		}
 
 		private void clear_Drop_Hover()
@@ -241,11 +247,11 @@ namespace XPTable.Models
 			last_hover_ = hover_row;
 			using (Graphics gr = table_.CreateGraphics())
 			{
-				renderer_.PaintDragDrop(gr, hover_row, table_.RowRect(hover_idx));
+				renderer_.PaintDragDrop(gr, hover_row, table_.RowRect(hover_idx));//:DragDropRenderer::DrawRectangle(new Pen(Color.Red), rowRect);
 			}
 		}
 
-		private int find_Row(DragEventArgs drgevent)
+		private int find_DragDrop_Target_Row(DragEventArgs drgevent)
 		{
 			Point pt = table_.PointToClient(new Point(drgevent.X, drgevent.Y));
 			int row = -1;
@@ -257,56 +263,50 @@ namespace XPTable.Models
 			}
 			else
 			{
-				row = table_.NearestRowIndexAt(pt.X, pt.Y);
+				row = table_.VirtualRowIndexAt(pt.X, pt.Y);
 			}
 			return row;
 		}
 
 		void table_DragDrop(object sender, DragEventArgs drgevent)
 		{
+			int hover_idx = find_DragDrop_Target_Row(drgevent);
+			Row hover_row = null;
+			if ((hover_idx >= 0) && (hover_idx < table_.TableModel.Rows.Count))
+				hover_row = table_.TableModel.Rows[hover_idx];
+			clear_Drop_Hover();
 			if (drgevent.Data.GetDataPresent(drag_type_, false))
 			{
 				//Debug.WriteLine("*** drag DROP");
 				DragItemData data = (DragItemData)drgevent.Data.GetData(drag_type_, false);
 				if ((data != null) && (data.table_ == table_))
 				{
-					int hover_idx = find_Row(drgevent);
 					//Debug.WriteLine("*** drop idx: " + hover_idx);
-					if ((hover_idx >= 0) && (hover_idx < table_.TableModel.Rows.Count))
+					if ((hover_row != null) && (hover_row != drag_row_))
 					{
-						Row hover_row = table_.TableModel.Rows[hover_idx];
-						if (hover_row != drag_row_)
+						int src_idx = table_.TableModel.Rows.IndexOf(drag_row_);
+						if ((src_idx >= 0) && (src_idx != hover_idx))
 						{
-							int src_idx = table_.TableModel.Rows.IndexOf(drag_row_);
-							if ((src_idx >= 0) && (src_idx != hover_idx))
-							{
-								int col = table_.FocusedCell.Column;
-								if (col < 0)
-									col = 0;
-								table_.TableModel.Rows.RemoveAt(src_idx);
-								table_.TableModel.Rows.Insert(hover_idx, drag_row_);
-								table_.TableModel.Selections.Clear();
-								table_.FocusedCell = new CellPos(hover_idx, col);
-								table_.TableModel.Selections.SelectCell(table_.FocusedCell);
-								table_.DragDropRowMoved(drag_row_, src_idx, hover_idx);
-							}
+							int col = table_.FocusedCell.Column;
+							if (col < 0)
+								col = 0;
+							table_.TableModel.Rows.RemoveAt(src_idx);
+							table_.TableModel.Rows.Insert(hover_idx, drag_row_);
+							table_.TableModel.Selections.Clear();
+							table_.FocusedCell = new CellPos(hover_idx, col);
+							table_.TableModel.Selections.SelectCell(table_.FocusedCell);
+							table_.DragDropRowMoved(drag_row_, src_idx, hover_idx);
 						}
 					}
 				}
-				clear_Drop_Hover();
-				return;
+				return;//:internal type handled
 			}
-			table_.DragDropExternalType(sender, drgevent);
+			table_.DragDropExternalType(sender, drgevent, hover_row, hover_idx);
 		}
 
 		void table_DragLeave(object sender, EventArgs drgevent)
 		{
-			if (drag_drop_mode_)
-			{
-				//Debug.WriteLine("*** drag LEAVE");
-				clear_Drop_Hover();
-				return;
-			}
+			clear_Drop_Hover();
 			table_.DragLeaveExternalType(sender, drgevent);
 		}
 
@@ -369,12 +369,12 @@ namespace XPTable.Models
 	/// <summary>
 	/// Represents the method that will handle DragOver functionality when the data is an external type.
 	/// </summary>
-	public delegate void DragOverExternalTypeEventHandler(object sender, DragEventArgs drgevent);
+	public delegate bool DragOverExternalTypeEventHandler(object sender, DragEventArgs drgevent, Row row, int destIndex);
 
 	/// <summary>
 	/// Represents the method that will handle Drop functionality when the data is an external type.
 	/// </summary>
-	public delegate void DragDropExternalTypeEventHandler(object sender, DragEventArgs drgevent);
+	public delegate void DragDropExternalTypeEventHandler(object sender, DragEventArgs drgevent, Row row, int destIndex);
 
 	/// <summary>
 	/// Represents the method that will handle DragLeave functionality when the data is an external type.
@@ -386,6 +386,7 @@ namespace XPTable.Models
 	/// Represents the method that will supply the index of the new row following a
 	/// successful DragDrop operation.
 	/// </summary>
+	//:NOTE: not implemented yet
 	public delegate void DragDropRowInsertedAtEventHandler(Row row, int destIndex);
 
 	/// <summary>

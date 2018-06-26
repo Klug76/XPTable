@@ -45,12 +45,12 @@ namespace XPTable.Models
 		/// </summary>
 		private TableModel owner;
 
-        /// <summary>
-        /// A Row that owns this row
-        /// </summary>
-        private Row rowowner;
+		/// <summary>
+		/// A Row that owns this row
+		/// </summary>
+		private Row rowowner;
 
-        private RowEventHandler propertyChangedEventHandler;
+		private RowEventHandler propertyChangedEventHandler;
 		#endregion
 
 
@@ -71,24 +71,24 @@ namespace XPTable.Models
 				
 			this.owner = owner;
 
-            propertyChangedEventHandler = new RowEventHandler(row_PropertyChanged);
+			propertyChangedEventHandler = new RowEventHandler(row_PropertyChanged);
 		}
 
-        /// <summary>
-        /// Initializes a new instance of the RowCollection class 
-        /// that belongs to the specified Row
-        /// </summary>
-        /// <param name="owner"></param>
-        public RowCollection(Row owner)
-            : base()
-        {
-            if (owner == null)
-            {
-                throw new ArgumentNullException("owner");
-            }
+		/// <summary>
+		/// Initializes a new instance of the RowCollection class 
+		/// that belongs to the specified Row
+		/// </summary>
+		/// <param name="owner"></param>
+		public RowCollection(Row owner)
+			: base()
+		{
+			if (owner == null)
+			{
+				throw new ArgumentNullException("owner");
+			}
 
-            this.rowowner = owner;
-        }
+			this.rowowner = owner;
+		}
 
 		#endregion
 		
@@ -106,110 +106,110 @@ namespace XPTable.Models
 
 			int index = this.List.Add(row);
 
-            if (owner != null)
-            {
-                // this RowCollection is the collection of toplevel rows
-                this.OnRowAdded(new TableModelEventArgs(this.owner, row, index, index));
-            }
-            else if (rowowner != null)
-            {
-                // this is a sub row, so it needs a parent
-                row.Parent = rowowner;
-                row.ChildIndex = this.List.Count;
-                this.OnRowAdded(new RowEventArgs(row, RowEventType.SubRowAdded, rowowner));
-            }
+			if (owner != null)
+			{
+				// this RowCollection is the collection of toplevel rows
+				this.OnRowAdded(new TableModelEventArgs(this.owner, row, index, index));
+			}
+			else if (rowowner != null)
+			{
+				// this is a sub row, so it needs a parent
+				row.Parent = rowowner;
+				row.ChildIndex = this.List.Count;
+				this.OnRowAdded(new RowEventArgs(row, RowEventType.SubRowAdded, rowowner));
+			}
 
-            row.PropertyChanged += propertyChangedEventHandler;
+			row.PropertyChanged += propertyChangedEventHandler;
 
 			return index;
 		}
 
 		private int _totalHiddenSubRows = 0;
 
-        /// <summary>
-        /// Gets the total number of subrows that are currently not expanded.
-        /// </summary>
-        public int HiddenSubRows
-        {
-            get { return _totalHiddenSubRows; }
-        }
-        
-        /// <summary>
-        /// Count the number of hidden rows before the supplied row.
-        /// </summary>
-        /// <param name="row">The row to count up to.</param>
-        /// <returns>The number of hidden rows.</returns>
-        internal int HiddenRowCountBefore(int row)
-        {
-            int result = 0;
+		/// <summary>
+		/// Gets the total number of subrows that are currently not expanded.
+		/// </summary>
+		public int HiddenSubRows
+		{
+			get { return _totalHiddenSubRows; }
+		}
+		
+		/// <summary>
+		/// Count the number of hidden rows before the supplied row.
+		/// </summary>
+		/// <param name="row">The row to count up to.</param>
+		/// <returns>The number of hidden rows.</returns>
+		internal int HiddenRowCountBefore(int row)
+		{
+			int result = 0;
 
-            int skip = 0;
-            for (int i = 0; i < row; i++)
-            {
-                if (skip > 0)
-                    skip--;
-                else if ((skip == 0) && (!this[i].ExpandSubRows))
-                {
-                    skip = this[i].SubRows.Count;
-                    result += skip;
-                }
-                else
-                    skip = this[i].SubRows.Count;
-            }
+			int skip = 0;
+			for (int i = 0; i < row; i++)
+			{
+				if (skip > 0)
+					skip--;
+				else if ((skip == 0) && (!this[i].ExpandSubRows))
+				{
+					skip = this[i].SubRows.Count;
+					result += skip;
+				}
+				else
+					skip = this[i].SubRows.Count;
+			}
 
-            return result;
-        }
+			return result;
+		}
 
-        /// <summary>
-        /// Count the number of hidden rows before the supplied row.
-        /// </summary>
-        /// <param name="row">The row to count up to.</param>
-        /// <returns>The number of hidden rows.</returns>
-        internal int HiddenRowCountBefore(Row row)
-        {
-            return HiddenRowCountBefore(IndexOf(row));
-        }
+		/// <summary>
+		/// Count the number of hidden rows before the supplied row.
+		/// </summary>
+		/// <param name="row">The row to count up to.</param>
+		/// <returns>The number of hidden rows.</returns>
+		internal int HiddenRowCountBefore(Row row)
+		{
+			return HiddenRowCountBefore(IndexOf(row));
+		}
 
-        /// <summary>
-        /// Collapses all sub rows.
-        /// </summary>
-        public void CollapseAllSubRows()
-        {
-            int i = 0;
-            while (i < this.Count)
-            {
-                if (this[i].SubRows.Count > 0)
-                    this[i].ExpandSubRows = false;
-                i++;
-            }
-        }
+		/// <summary>
+		/// Collapses all sub rows.
+		/// </summary>
+		public void CollapseAllSubRows()
+		{
+			int i = 0;
+			while (i < this.Count)
+			{
+				if (this[i].SubRows.Count > 0)
+					this[i].ExpandSubRows = false;
+				i++;
+			}
+		}
 
-        /// <summary>
-        /// Expands all sub rows.
-        /// </summary>
-        public void ExpandAllSubRows()
-        {
-            int i = 0;
-            while (i < this.Count)
-            {
-                if (this[i].Parent == null)
-                {
-                    this[i].ExpandSubRows = true;
-                    i += this[i].SubRows.Count;
-                }
-            }
-        }
+		/// <summary>
+		/// Expands all sub rows.
+		/// </summary>
+		public void ExpandAllSubRows()
+		{
+			int i = 0;
+			while (i < this.Count)
+			{
+				if (this[i].Parent == null)
+				{
+					this[i].ExpandSubRows = true;
+					i += this[i].SubRows.Count;
+				}
+			}
+		}
 
-        private void row_PropertyChanged(object sender, RowEventArgs e)
-        {
-            if (e.EventType == RowEventType.ExpandSubRowsChanged)
-            {
-                if (!e.Row.ExpandSubRows)
-                    _totalHiddenSubRows += e.Row.SubRows.Count;
-                else
-                    _totalHiddenSubRows -= e.Row.SubRows.Count;
+		private void row_PropertyChanged(object sender, RowEventArgs e)
+		{
+			if (e.EventType == RowEventType.ExpandSubRowsChanged)
+			{
+				if (!e.Row.ExpandSubRows)
+					_totalHiddenSubRows += e.Row.SubRows.Count;
+				else
+					_totalHiddenSubRows -= e.Row.SubRows.Count;
 
-            }
+			}
 		}
 
 
@@ -279,28 +279,28 @@ namespace XPTable.Models
 				RemoveControlIfRequired(index);
 				this.List.RemoveAt(index);
 
-                if (owner != null)
-    				this.OnRowRemoved(new TableModelEventArgs(this.owner, row, index, index));
+				if (owner != null)
+					this.OnRowRemoved(new TableModelEventArgs(this.owner, row, index, index));
 
-                else if (rowowner != null)
-                    this.OnRowRemoved(new RowEventArgs(row, RowEventType.SubRowRemoved, rowowner));
+				else if (rowowner != null)
+					this.OnRowRemoved(new RowEventArgs(row, RowEventType.SubRowRemoved, rowowner));
 
-                row.PropertyChanged -= propertyChangedEventHandler;
-            }
+				row.PropertyChanged -= propertyChangedEventHandler;
+			}
 		}
 
-        private void RemoveControlIfRequired(int index)
-        {
-            for (int i = 0; i < this[index].Cells.Count; i++)
-            {
-                Cell cell = this[index].Cells[i];
-                if (cell.RendererData is XPTable.Renderers.ControlRendererData)
-                {
-                    if ((cell.RendererData as XPTable.Renderers.ControlRendererData).Control != null)
-                        cell.Row.TableModel.Table.Controls.Remove((cell.RendererData as XPTable.Renderers.ControlRendererData).Control);
-                }
-            }
-        }
+		private void RemoveControlIfRequired(int index)
+		{
+			for (int i = 0; i < this[index].Cells.Count; i++)
+			{
+				Cell cell = this[index].Cells[i];
+				if (cell.RendererData is XPTable.Renderers.ControlRendererData)
+				{
+					if ((cell.RendererData as XPTable.Renderers.ControlRendererData).Control != null)
+						cell.Row.TableModel.Table.Controls.Remove((cell.RendererData as XPTable.Renderers.ControlRendererData).Control);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Removes all Rows from the collection
@@ -321,12 +321,12 @@ namespace XPTable.Models
 			base.Clear();
 			this.InnerList.Capacity = 0;
 
-            if (owner != null)
-                this.owner.OnRowRemoved(new TableModelEventArgs(this.owner, null, -1, -1));
+			if (owner != null)
+				this.owner.OnRowRemoved(new TableModelEventArgs(this.owner, null, -1, -1));
 
-            else if (rowowner != null)
-                this.OnRowRemoved(new RowEventArgs(null, RowEventType.SubRowRemoved, rowowner));
-        }
+			else if (rowowner != null)
+				this.OnRowRemoved(new RowEventArgs(null, RowEventType.SubRowRemoved, rowowner));
+		}
 
 		/// <summary>
 		/// Inserts a Row into the collection at the specified index
@@ -354,16 +354,16 @@ namespace XPTable.Models
 			{
 				base.List.Insert(index, row);
 
-                if (owner != null)
-                    this.owner.OnRowAdded(new TableModelEventArgs(this.owner, row, index, index));
+				if (owner != null)
+					this.owner.OnRowAdded(new TableModelEventArgs(this.owner, row, index, index));
 
-                else if (rowowner != null)
-                {
-                    RowEventArgs args = new RowEventArgs(row, RowEventType.SubRowAdded, rowowner);
-                    args.SetRowIndex(index);
-                    this.OnRowAdded(args);
-                }
-            }
+				else if (rowowner != null)
+				{
+					RowEventArgs args = new RowEventArgs(row, RowEventType.SubRowAdded, rowowner);
+					args.SetRowIndex(index);
+					this.OnRowAdded(args);
+				}
+			}
 		}
 
 
@@ -501,9 +501,9 @@ namespace XPTable.Models
 		/// Raises the RowRemoved event
 		/// </summary>
 		/// <param name="e">A TableModelEventArgs that contains the event data</param>
-        protected virtual void OnRowRemoved(RowEventArgs e)
+		protected virtual void OnRowRemoved(RowEventArgs e)
 		{
-            this.rowowner.OnSubRowRemoved(e);
+			this.rowowner.OnSubRowRemoved(e);
 		}
 		#endregion
 	}

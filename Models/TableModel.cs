@@ -225,6 +225,28 @@ namespace XPTable.Models
 			return row;
 		}
 
+		/// <summary>
+		/// Returns the index of the nearest Row that lies on the specified position
+		/// </summary>
+		/// <param name="yPosition">The y-coordinate to check</param>
+		/// <returns>The index of the nearest Row at the specified position in range -1..row::Count</returns>
+		public int VirtualRowIndexAt(int yPosition)
+		{
+			int row;
+			if (this.Table.EnableWordWrap)
+			{//TODO fix me
+				row = this.RowIndexAtExact(yPosition);
+			}
+			else
+			{
+				row = yPosition / this.RowHeight;
+			}
+			if (row < -1)
+				return -1;
+			if (row > this.Rows.Count)
+				return this.Rows.Count;
+			return row;
+		}
 
 		/// <summary>
 		/// Returns the index of the Row that lies on the specified position.

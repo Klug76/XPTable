@@ -40,6 +40,7 @@ namespace xptable_test
 			last_row.Cells.Add(cell);
 
 			last_row.Editable = false;
+			//last_row.ExpandSubRows = false;//bug: wrong grop +- glyph
 			table_model.Rows.Add(last_row);
 			for (int i = 0; i < 16; ++i)
 			{
@@ -47,7 +48,15 @@ namespace xptable_test
 				add_Cells(sub_row, 200 + i);
 				last_row.SubRows.Add(sub_row);
 			}
-			
+
+			for (int i = 10; i < 20; ++i)
+			{
+				var row = new Row();
+				add_Cells(row, i + 1);
+				table_model.Rows.Add(row);
+				++last_idx_;
+			}
+
 		}
 
 		private void add_Cells(Row row, int idx)
@@ -125,6 +134,13 @@ namespace xptable_test
 			Debug.WriteLine("Form1::DragLeave");
 		}
 
+		private void Form1_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+		{
+			//:GiveFeedback event is fired on the drag source, unlike the other events that fire on the drop target
+			//:so no luck
+			Debug.WriteLine("Form1::GiveFeedback");
+		}
+
 		private void xp_table_DragDropRowMovedEvent(Row row, int srcIndex, int destIndex)
 		{
 			Debug.WriteLine("DragDropRowMovedEvent(" + srcIndex + ", " + destIndex + ")");
@@ -142,15 +158,16 @@ namespace xptable_test
 			Form1_DragEnter(sender, drgevent);
 		}
 
-		private void xp_table_DragOverExternalTypeEvent(object sender, DragEventArgs drgevent)
+		private bool xp_table_DragOverExternalTypeEvent(object sender, DragEventArgs drgevent, Row row, int destIndex)
 		{
 			//Debug.WriteLine("xp_table::DragOver");
 			Form1_DragOver(sender, drgevent);
+			return false;
 		}
 
-		private void xp_table_DragDropExternalTypeEvent(object sender, DragEventArgs drgevent)
+		private void xp_table_DragDropExternalTypeEvent(object sender, DragEventArgs drgevent, Row row, int destIndex)
 		{
-			Debug.WriteLine("xp_table::Drop");
+			Debug.WriteLine("xp_table::Drop to row " + destIndex);
 			Form1_DragDrop(sender, drgevent);
 		}
 

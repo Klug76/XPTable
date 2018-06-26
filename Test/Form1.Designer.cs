@@ -177,6 +177,7 @@ namespace xptable_test
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
 			this.DragOver += new System.Windows.Forms.DragEventHandler(this.Form1_DragOver);
 			this.DragLeave += new System.EventHandler(this.Form1_DragLeave);
+			this.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.Form1_GiveFeedback);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.xp_table)).EndInit();

@@ -1830,6 +1830,35 @@ namespace XPTable.Models
 		}
 
 		/// <summary>
+		/// Returns the index of the nearest Row at the specified client coordinates
+		/// </summary>
+		/// <param name="x">The client x coordinate of the Row</param>
+		/// <param name="y">The client y coordinate of the Row</param>
+		/// <returns>The index of the nearest Row at the specified client coordinates, in range -1..row::Count</returns>
+		public int VirtualRowIndexAt(int x, int y)
+		{
+			if (this.TableModel == null)
+			{
+				return -1;
+			}
+
+			if (this.HeaderStyle != ColumnHeaderStyle.None)
+			{
+				y -= this.HeaderHeight;
+			}
+
+			y -= this.BorderWidth;
+
+
+			if (this.VScroll)
+			{
+				y += this.VScrollOffset();
+			}
+
+			return this.TableModel.VirtualRowIndexAt(y);
+		}
+
+		/// <summary>
 		/// Returns the index of the Row at the specified client point
 		/// </summary>
 		/// <param name="p">The point of interest</param>
@@ -3357,16 +3386,18 @@ namespace XPTable.Models
 				DragEnterExternalTypeEvent(sender, drgevent);
 		}
 
-		internal void DragOverExternalType(object sender, DragEventArgs drgevent)
+		internal bool DragOverExternalType(object sender, DragEventArgs drgevent, Row row, int destIndex)
 		{
 			if (DragOverExternalTypeEvent != null)
-				DragOverExternalTypeEvent(sender, drgevent);
+				return DragOverExternalTypeEvent(sender, drgevent, row, destIndex);
+			drgevent.Effect = DragDropEffects.None;
+			return false;
 		}
 
-		internal void DragDropExternalType(object sender, DragEventArgs drgevent)
+		internal void DragDropExternalType(object sender, DragEventArgs drgevent, Row row, int destIndex)
 		{
 			if (DragDropExternalTypeEvent != null)
-				DragDropExternalTypeEvent(sender, drgevent);
+				DragDropExternalTypeEvent(sender, drgevent, row, destIndex);
 		}
 
 		internal void DragLeaveExternalType(object sender, EventArgs drgevent)
@@ -3377,7 +3408,7 @@ namespace XPTable.Models
 
 
 		internal void DragDropRowInsertedAt(Row row, int destIndex)
-		{
+		{//:NOTE: not implemented yet
 			if (DragDropRowInsertedAtEvent != null)
 				DragDropRowInsertedAtEvent(row, destIndex);
 		}
