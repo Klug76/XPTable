@@ -418,9 +418,6 @@
     <Compile Include="Renderers\GroupCellRenderer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Renderers\GroupRendererData.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Renderers\HeaderRenderer.cs">
       <SubType>Code</SubType>
     </Compile>

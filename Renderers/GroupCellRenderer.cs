@@ -108,6 +108,7 @@ namespace XPTable.Renderers
 			return checkRect;
 		}
 
+		/*
 		/// <summary>
 		/// Gets the GroupRendererData specific data used by the Renderer from 
 		/// the specified Cell
@@ -127,6 +128,7 @@ namespace XPTable.Renderers
 
 			return (GroupRendererData) rendererData;
 		}
+		*/
 
 		/// <summary>
 		/// Returns true if this cell is in a sub row.
@@ -138,26 +140,26 @@ namespace XPTable.Renderers
 			return cell.Row.Parent != null;
 		}
 
-        /// <summary>
-        /// Returns true if this cell is in the last subrow.
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <returns></returns>
-        private bool IsLastRow(Cell cell)
-        {
-            if (cell.Row.Parent != null)
-            {
-                Row parent = cell.Row.Parent;
-                if (parent.SubRows.IndexOf(cell.Row) == parent.SubRows.Count-1)
-                    return true;
-                else
-                    return false;
-            }
-            else
-                return false;
-        }
+		/// <summary>
+		/// Returns true if this cell is in the last subrow.
+		/// </summary>
+		/// <param name="cell"></param>
+		/// <returns></returns>
+		private bool IsLastRow(Cell cell)
+		{
+			if (cell.Row.Parent != null)
+			{
+				Row parent = cell.Row.Parent;
+				if (parent.SubRows.IndexOf(cell.Row) == parent.SubRows.Count-1)
+					return true;
+				else
+					return false;
+			}
+			else
+				return false;
+		}
 
-        #endregion
+		#endregion
 
 
 		#region Properties
@@ -224,10 +226,9 @@ namespace XPTable.Renderers
 
 		private void ToggleState(CellMouseEventArgs e)
 		{
-			GroupRendererData data = this.GetGroupRendererData(e.Cell);
-
+			//GroupRendererData data = this.GetGroupRendererData(e.Cell);
 			// Toggle the group state
-			data.Grouped = !data.Grouped;
+			//data.Grouped = !data.Grouped;
 
 			Row r = e.Table.TableModel.Rows[e.Row];
 			r.ExpandSubRows = !r.ExpandSubRows;
@@ -284,15 +285,15 @@ namespace XPTable.Renderers
 			int middle = (int)Math.Floor(rect.Y + (double)rect.Height/2);
 
 			g.DrawLine(p, x, middle + 2, x, middle - 2);
-        }
+		}
 
-        #region Style 1
-        /// <summary>
-        /// Draws a line on the RHS
-        /// </summary>
-        /// <param name="g"></param>
-        /// <param name="p"></param>
-        /// <param name="rect"></param>
+		#region Style 1
+		/// <summary>
+		/// Draws a line on the RHS
+		/// </summary>
+		/// <param name="g"></param>
+		/// <param name="p"></param>
+		/// <param name="rect"></param>
 		private void DrawLine1(Graphics g, Pen p, Rectangle rect)
 		{
 			int halfwidth = (int)Math.Floor(this.Bounds.Width * 0.75);
@@ -301,12 +302,12 @@ namespace XPTable.Renderers
 			g.DrawLine(p, x, this.Bounds.Top, x, this.Bounds.Bottom);
 		}
 
-        /// <summary>
-        /// Draws a line on the RHS and joins it up to the RHS of the box
-        /// </summary>
-        /// <param name="g"></param>
-        /// <param name="p"></param>
-        /// <param name="rect"></param>
+		/// <summary>
+		/// Draws a line on the RHS and joins it up to the RHS of the box
+		/// </summary>
+		/// <param name="g"></param>
+		/// <param name="p"></param>
+		/// <param name="rect"></param>
 		private void DrawHalfLine1(Graphics g, Pen p, Rectangle rect)
 		{
 			int halfwidth = (int)Math.Floor(this.Bounds.Width * 0.75);
@@ -318,57 +319,57 @@ namespace XPTable.Renderers
 			// and connect it to the box
 			int x2 = (int)Math.Floor(rect.X + (double)rect.Width/2);
 			g.DrawLine(p, x, top, x2 + 4, top);
-        }
-        #endregion
+		}
+		#endregion
 
-        #region Style 2
-        /// <summary>
-        /// Draws a line down the middle
-        /// </summary>
-        /// <param name="g"></param>
-        /// <param name="p"></param>
-        /// <param name="rect"></param>
-        private void DrawLine2(Graphics g, Pen p, Rectangle rect)
-        {
-            int halfwidth = (int)Math.Floor(this.Bounds.Width * 0.75);
-            int x = (int)Math.Floor(rect.X + (double)rect.Width / 2);
+		#region Style 2
+		/// <summary>
+		/// Draws a line down the middle
+		/// </summary>
+		/// <param name="g"></param>
+		/// <param name="p"></param>
+		/// <param name="rect"></param>
+		private void DrawLine2(Graphics g, Pen p, Rectangle rect)
+		{
+			int halfwidth = (int)Math.Floor(this.Bounds.Width * 0.75);
+			int x = (int)Math.Floor(rect.X + (double)rect.Width / 2);
 
-            g.DrawLine(p, x, this.Bounds.Top, x, this.Bounds.Bottom);
-        }
+			g.DrawLine(p, x, this.Bounds.Top, x, this.Bounds.Bottom);
+		}
 
-        private void DrawEndLine2(Graphics g, Pen p, Rectangle rect)
-        {
-            int halfwidth = (int)Math.Floor(this.Bounds.Width * 0.75);
-            int x1 = (int)Math.Floor(rect.X + (double)rect.Width / 2);
+		private void DrawEndLine2(Graphics g, Pen p, Rectangle rect)
+		{
+			int halfwidth = (int)Math.Floor(this.Bounds.Width * 0.75);
+			int x1 = (int)Math.Floor(rect.X + (double)rect.Width / 2);
 
-            int bottom = (int)Math.Floor(this.Bounds.Y + (double)this.Bounds.Height / 2);
-            g.DrawLine(p, x1, this.Bounds.Top, x1, bottom);
+			int bottom = (int)Math.Floor(this.Bounds.Y + (double)this.Bounds.Height / 2);
+			g.DrawLine(p, x1, this.Bounds.Top, x1, bottom);
 
-            int x2 = 4 + (int)Math.Floor(rect.X + (double)rect.Width / 2);
+			int x2 = 4 + (int)Math.Floor(rect.X + (double)rect.Width / 2);
 
-            g.DrawLine(p, x1, bottom, x2, bottom);
-        }
+			g.DrawLine(p, x1, bottom, x2, bottom);
+		}
 
 
-        /// <summary>
-        /// Draw a line down the middle, up to the bottom of the box.
-        /// </summary>
-        /// <param name="g"></param>
-        /// <param name="p"></param>
-        /// <param name="rect"></param>
-        private void DrawHalfLine2(Graphics g, Pen p, Rectangle rect)
-        {
-            int halfwidth = (int)Math.Floor(this.Bounds.Width * 0.75);
-            int x = (int)Math.Floor(rect.X + (double)rect.Width / 2);
-            int top = 4 + (int)Math.Floor(rect.Y + (double)rect.Height / 2);
+		/// <summary>
+		/// Draw a line down the middle, up to the bottom of the box.
+		/// </summary>
+		/// <param name="g"></param>
+		/// <param name="p"></param>
+		/// <param name="rect"></param>
+		private void DrawHalfLine2(Graphics g, Pen p, Rectangle rect)
+		{
+			int halfwidth = (int)Math.Floor(this.Bounds.Width * 0.75);
+			int x = (int)Math.Floor(rect.X + (double)rect.Width / 2);
+			int top = 4 + (int)Math.Floor(rect.Y + (double)rect.Height / 2);
 
-            g.DrawLine(p, x, top, x, this.Bounds.Bottom);
+			g.DrawLine(p, x, top, x, this.Bounds.Bottom);
 
-            // and connect it to the box
-            int x2 = (int)Math.Floor(rect.X + (double)rect.Width / 2);
-            g.DrawLine(p, x, top, x2 + 4, top);
-        }
-        #endregion
+			// and connect it to the box
+			int x2 = (int)Math.Floor(rect.X + (double)rect.Width / 2);
+			g.DrawLine(p, x, top, x2 + 4, top);
+		}
+		#endregion
 
 		/// <summary>
 		/// Raises the Paint event
@@ -386,35 +387,36 @@ namespace XPTable.Renderers
 
 			Rectangle checkRect = this.CalcCheckRect(this.LineAlignment, this.Alignment);
 
-            if (!this.IsSubRow(e.Cell))
-            {
-                // Draw nothing if this row has no child rows
-                if (e.Cell.Row.SubRows.Count > 0)
-                {
-                    // This is a parent row - draw a + or - in a box
-                    GroupRendererData data = this.GetGroupRendererData(e.Cell);
+			if (!this.IsSubRow(e.Cell))
+			{
+				// Draw nothing if this row has no child rows
+				if (e.Cell.Row.SubRows.Count > 0)
+				{
+					// This is a parent row - draw a + or - in a box
+					//GroupRendererData data = this.GetGroupRendererData(e.Cell);
 
-                    DrawBox(e.Graphics, this.LineColorPen, checkRect);
+					DrawBox(e.Graphics, this.LineColorPen, checkRect);
 
-                    if (data.Grouped)
-                    {
-                        DrawCross(e.Graphics, Pens.Gray, checkRect);
-                    }
-                    else
-                    {
-                        DrawMinus(e.Graphics, Pens.Gray, checkRect);
-                        DrawHalfLine2(e.Graphics, this.LineColorPen, checkRect);
-                    }
-                }
-            }
-            else
-            {
-                // This is a subrow so either draw the end-line or the normal line
-                if (this.IsLastRow(e.Cell))
-                    DrawEndLine2(e.Graphics, this.LineColorPen, checkRect);
-                else
-                    DrawLine2(e.Graphics, this.LineColorPen, checkRect);
-            }
+					//if (data.Grouped)
+					if (!e.Cell.Row.ExpandSubRows)//:Klug: bugfix: data.Grouped does not match to !e.Cell.Row.ExpandSubRows, so kill it
+					{
+						DrawCross(e.Graphics, Pens.Gray, checkRect);
+					}
+					else
+					{
+						DrawMinus(e.Graphics, Pens.Gray, checkRect);
+						DrawHalfLine2(e.Graphics, this.LineColorPen, checkRect);
+					}
+				}
+			}
+			else
+			{
+				// This is a subrow so either draw the end-line or the normal line
+				if (this.IsLastRow(e.Cell))
+					DrawEndLine2(e.Graphics, this.LineColorPen, checkRect);
+				else
+					DrawLine2(e.Graphics, this.LineColorPen, checkRect);
+			}
 
 			#region Draw text
 			if (this.drawText)

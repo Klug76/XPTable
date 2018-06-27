@@ -13,10 +13,14 @@ namespace xptable_test
 	public partial class Form1 : Form
 	{
 		private int last_idx_ = 0;
+		private int last_over_ = -1;
 
 		public Form1()
 		{
 			InitializeComponent();
+			
+			//xp_table.EnableWordWrap = true;
+
 			//var group_column = new GroupColumn("", 20);
 			//group_column.ToggleOnSingleClick = true;
 			//column_model.Columns.Add(group_column);
@@ -32,21 +36,23 @@ namespace xptable_test
 			}
 			
 			// +group
-			var last_row = new Row();
+			var group_row = new Row();
 			//add_Cells(last_row, 100);
-			last_row.Cells.Add(new Cell());
-			var cell = new Cell("archive");
-			cell.ColSpan = 2;
-			last_row.Cells.Add(cell);
+			group_row.Cells.Add(new Cell());
+			group_row.Cells.Add(new Cell("1"));
+			group_row.Cells.Add(new Cell("Group #1")
+			{
+				ColSpan = 2
+			});
 
-			last_row.Editable = false;
-			//last_row.ExpandSubRows = false;//bug: wrong grop +- glyph
-			table_model.Rows.Add(last_row);
-			for (int i = 0; i < 16; ++i)
+			group_row.Editable = false;
+			group_row.ExpandSubRows = false;//bug: wrong grop +- glyph - fixed
+			table_model.Rows.Add(group_row);
+			for (int i = 0; i < 10; ++i)
 			{
 				var sub_row = new Row();
-				add_Cells(sub_row, 200 + i);
-				last_row.SubRows.Add(sub_row);
+				add_Cells(sub_row, 100 + i);
+				group_row.SubRows.Add(sub_row);
 			}
 
 			for (int i = 10; i < 20; ++i)
@@ -63,7 +69,7 @@ namespace xptable_test
 		{
 			var cells = row.Cells;
 			cells.Add(new Cell());
-			cells.Add(new Cell("" + idx));
+			cells.Add(new Cell("#" + idx));
 			cells.Add(new Cell("Text " + idx));
 			for (int i = 0; i < cells.Count; ++i)
 				row.Cells[i].ToolTipText = "hint";
@@ -160,15 +166,42 @@ namespace xptable_test
 
 		private bool xp_table_DragOverExternalTypeEvent(object sender, DragEventArgs drgevent, Row row, int destIndex)
 		{
-			//Debug.WriteLine("xp_table::DragOver");
+			if (last_over_ != destIndex)
+			{
+				last_over_ = destIndex;
+				Debug.WriteLine("xp_table::DragOver " + destIndex);
+				if (row != null)
+					Debug.WriteLine("********** xp_table::DragOver row #" + row.Index + " " + get_Row_Text(row));
+			}
 			Form1_DragOver(sender, drgevent);
 			return false;
 		}
 
 		private void xp_table_DragDropExternalTypeEvent(object sender, DragEventArgs drgevent, Row row, int destIndex)
 		{
-			Debug.WriteLine("xp_table::Drop to row " + destIndex);
+			Debug.WriteLine("xp_table::Drop to " + destIndex);
+			if (row != null)
+				Debug.WriteLine("********** xp_table::Drop to row #" + row.Index + " " + get_Row_Text(row));
+
 			Form1_DragDrop(sender, drgevent);
+		}
+
+		private string get_Row_Text(Row row)
+		{
+			var cells = row.Cells;
+			string result = "";
+			for (int i = 0; i < cells.Count; ++i)
+			{
+				var cell = cells[i];
+				string s = cell.Text;
+				if ((s != null) && (s.Length > 0))
+				{
+					if (result.Length > 0)
+						result += " ";
+					result += s;
+				}
+			}
+			return result;
 		}
 
 		private void xp_table_DragLeaveExternalTypeEvent(object sender, EventArgs drgevent)

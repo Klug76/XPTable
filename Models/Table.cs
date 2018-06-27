@@ -1804,36 +1804,6 @@ namespace XPTable.Models
 		/// </summary>
 		/// <param name="x">The client x coordinate of the Row</param>
 		/// <param name="y">The client y coordinate of the Row</param>
-		/// <returns>The index of the nearest Row at the specified client coordinates, or
-		/// -1 if no row exist</returns>
-		public int NearestRowIndexAt(int x, int y)
-		{
-			if (this.TableModel == null)
-			{
-				return -1;
-			}
-
-			if (this.HeaderStyle != ColumnHeaderStyle.None)
-			{
-				y -= this.HeaderHeight;
-			}
-
-			y -= this.BorderWidth;
-
-
-			if (this.VScroll)
-			{
-				y += this.VScrollOffset();
-			}
-
-			return this.TableModel.NearestRowIndexAt(y);
-		}
-
-		/// <summary>
-		/// Returns the index of the nearest Row at the specified client coordinates
-		/// </summary>
-		/// <param name="x">The client x coordinate of the Row</param>
-		/// <param name="y">The client y coordinate of the Row</param>
 		/// <returns>The index of the nearest Row at the specified client coordinates, in range -1..row::Count</returns>
 		public int VirtualRowIndexAt(int x, int y)
 		{
@@ -8950,6 +8920,8 @@ namespace XPTable.Models
 					{
 						for (int span = 1; span < cell.ColSpan; span++)
 						{
+							if (i + span >= this.ColumnModel.Columns.Count)
+								break;//:Klug: bugfix - null ref
 							cellRect.Width += this.ColumnModel.Columns[i + span].Width;
 						}
 					}

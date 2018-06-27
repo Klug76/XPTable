@@ -183,7 +183,7 @@ namespace XPTable.Models
 		public int RowIndexAt(int yPosition)
 		{
 			int row;
-			if (this.Table.EnableWordWrap)
+			if (this.Table.EnableWordWrap || (this.Table.TableModel.Rows.HiddenSubRows > 0))
 			{
 				row = this.RowIndexAtExact(yPosition);
 			}
@@ -204,47 +204,18 @@ namespace XPTable.Models
 		/// Returns the index of the nearest Row that lies on the specified position
 		/// </summary>
 		/// <param name="yPosition">The y-coordinate to check</param>
-		/// <returns>The index of the nearest Row at the specified position or -1 if 
-		/// no Row is found</returns>
-		public int NearestRowIndexAt(int yPosition)
-		{
-			int row;
-			if (this.Table.EnableWordWrap)
-			{
-				row = this.RowIndexAtExact(yPosition);
-			}
-			else
-			{
-				row = yPosition / this.RowHeight;
-			}
-
-			if (row < 0)
-				return 0;
-			if (row >= this.Rows.Count)
-				return this.Rows.Count - 1;
-			return row;
-		}
-
-		/// <summary>
-		/// Returns the index of the nearest Row that lies on the specified position
-		/// </summary>
-		/// <param name="yPosition">The y-coordinate to check</param>
 		/// <returns>The index of the nearest Row at the specified position in range -1..row::Count</returns>
 		public int VirtualRowIndexAt(int yPosition)
 		{
 			int row;
-			if (this.Table.EnableWordWrap)
-			{//TODO fix me
-				row = this.RowIndexAtExact(yPosition);
+			if (this.Table.EnableWordWrap || (this.Table.TableModel.Rows.HiddenSubRows > 0))
+			{
+				row = this.VirtualRowIndexAtExact(yPosition);
 			}
 			else
 			{
 				row = yPosition / this.RowHeight;
 			}
-			if (row < -1)
-				return -1;
-			if (row > this.Rows.Count)
-				return this.Rows.Count;
 			return row;
 		}
 
@@ -270,6 +241,30 @@ namespace XPTable.Models
 
 			// If we've got this far then its the last row
 			return this.Rows.Count - 1;
+		}
+
+		/// <summary>
+		/// Returns the index of the Row that lies on the specified position.
+		/// Found by iterating through all rows (i.e. copes with variable height rows).
+		/// </summary>
+		/// <param name="yPosition"></param>
+		/// <returns></returns>
+		private int VirtualRowIndexAtExact(int yPosition)
+		{
+			int height = 0;
+			if (yPosition < 0)
+				return -1;
+			for (int i = 0; i < this.Rows.Count; i++)
+			{
+				Row row = this.Rows[i];
+				if (row.Parent == null || row.Parent.ExpandSubRows)
+				{
+					height += row.Height;
+					if (yPosition < height)
+						return i;
+				}
+			}
+			return this.Rows.Count;
 		}
 		#endregion
 

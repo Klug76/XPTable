@@ -214,7 +214,7 @@ namespace XPTable.Models
 					if ((hover_row != null) && (hover_row != drag_row_))
 						effect = DragDropEffects.Move;
 				}
-				if (DragDropEffects.Move == effect)
+				if ((hover_row != null) && (DragDropEffects.Move == effect))
 					paint_Drop_Hover(hover_idx, hover_row);
 				else
 					clear_Drop_Hover();
@@ -223,7 +223,7 @@ namespace XPTable.Models
 			}
 			if (table_.DragOverExternalType(sender, drgevent, hover_row, hover_idx))
 				return;
-			if (drgevent.Effect != DragDropEffects.None)
+			if ((hover_row != null) && (drgevent.Effect != DragDropEffects.None))
 				paint_Drop_Hover(hover_idx, hover_row);
 			else
 				clear_Drop_Hover();
