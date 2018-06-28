@@ -956,7 +956,7 @@ namespace XPTable.Models
 		{
 			int yOffset;
 			// This adds on the total height we can't see
-			if (this.EnableWordWrap)
+			if (this.EnableWordWrap || (this.TableModel.Rows.HiddenSubRows > 0))
 			{
 				yOffset = this.RowY(this.TopIndex);
 			}
@@ -1856,7 +1856,7 @@ namespace XPTable.Models
 
 			rect.X = this.DisplayRectangleLeft;
 
-			if (this.EnableWordWrap)
+			if (this.EnableWordWrap || (this.TableModel.Rows.HiddenSubRows > 0))
 			{
 				rect.Y = this.BorderWidth + RowIndexToClient(row);
 				rect.Height = this.TableModel.Rows[row].Height;
@@ -2580,7 +2580,7 @@ namespace XPTable.Models
 
 				this.ColumnModel.Columns.RecalcWidthCache();
 
-				if (this.EnableWordWrap)
+				if (this.EnableWordWrap || (this.TableModel.Rows.HiddenSubRows > 0))
 				{
 					if (autoCalculateRowHeights)
 						this.CalculateAllRowHeights();
@@ -4285,7 +4285,7 @@ namespace XPTable.Models
 				// v1.1.1 fix (jover) - used to error if no rows were added
 				if (this.TableModel == null || this.TableModel.Rows.Count == 0)
 					return 0;
-				else if (this.EnableWordWrap)
+				else if (this.EnableWordWrap || (this.TableModel.Rows.HiddenSubRows > 0))
 					return this.RowY(this.TableModel.Rows.Count);
 				else
 					return this.TableModel.Rows.Count * this.RowHeight;
@@ -4339,7 +4339,7 @@ namespace XPTable.Models
 		private int GetVisibleRowCount(bool hScroll, bool vScroll)
 		{
 			int count;
-			if (this.EnableWordWrap)
+			if (this.EnableWordWrap || (this.TableModel.Rows.HiddenSubRows > 0))
 			{
 				count = this.VisibleRowCountExact();
 			}
@@ -7990,7 +7990,7 @@ namespace XPTable.Models
 			OnAfterFirstPaint(EventArgs.Empty);
 
 			// Do this so that scrollbars are evaluated whilst the actual row heights are known
-			if (this.EnableWordWrap)
+			if (this.EnableWordWrap || (this.TableModel.Rows.HiddenSubRows > 0))
 			{
 				if (autoCalculateRowHeights)
 					this.CalculateAllRowHeights();
@@ -8788,7 +8788,7 @@ namespace XPTable.Models
 				yPos += this.HeaderHeight;
 			}
 
-			bool wordWrapOn = this.EnableWordWrap;
+			bool varyHeight = this.EnableWordWrap || (this.TableModel.Rows.HiddenSubRows > 0);
 
 			Rectangle rowRect = new Rectangle(xPos, yPos, this.ColumnModel.TotalColumnWidth, this.RowHeight);
 
@@ -8814,7 +8814,7 @@ namespace XPTable.Models
 
 				rowRect.Height = row.Height;
 
-				if (wordWrapOn)
+				if (varyHeight)
 				{
 					rowRect.Height = this.GetRenderedRowHeight(e.Graphics, row);
 					row.InternalHeight = rowRect.Height;
@@ -9197,7 +9197,7 @@ namespace XPTable.Models
 
 
 		private void vScrollBar_ValueChanged(object sender, EventArgs e)
-		{
+		{//TODO review
 			int newtopIndex = GetNewTopRowIndex(topIndex, vScrollBar.Value - lastVScrollValue);
 
 			topIndex = newtopIndex;

@@ -9,6 +9,8 @@ There were a few bugs in v1.2.2 that broke when using group columns:
 
 .how to drop file to the specific row?
 
+.BUG: drag cause subrow mess
+
 +.BUG: drag cause row mess and crash!
 	=>
 +.rewrite drag n drop

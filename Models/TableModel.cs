@@ -1329,7 +1329,7 @@ namespace XPTable.Models
 				if (this.owner.Table != null && this.owner.Table.ColumnModel != null)
 					bounds.Width = this.owner.Table.ColumnModel.VisibleColumnsWidth;
 
-				if (this.owner.Table.EnableWordWrap)
+				if (this.owner.Table.EnableWordWrap || (this.owner.Table.TableModel.Rows.HiddenSubRows > 0))
 				{
 					// v1.1.1 fix - this Y value used to include the border + header height
 
